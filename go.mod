@@ -3,6 +3,7 @@ module github.com/mndon/gf-extensions
 go 1.17
 
 require (
+	github.com/aliyun/aliyun-oss-go-sdk v2.2.5+incompatible
 	github.com/gogf/gf-jwt/v2 v2.0.1
 	github.com/gogf/gf/v2 v2.0.6
 )
@@ -30,5 +31,6 @@ require (
 	golang.org/x/net v0.0.0-20211112202133-69e39bad7dc2 // indirect
 	golang.org/x/sys v0.0.0-20210809222454-d867a43fc93e // indirect
 	golang.org/x/text v0.3.8-0.20211105212822-18b340fc7af2 // indirect
+	golang.org/x/time v0.1.0 // indirect
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
 )
