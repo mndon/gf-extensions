@@ -1,4 +1,4 @@
-module gf-extensions
+module github.com/mndon/gf-extensions
 
 go 1.17
 
