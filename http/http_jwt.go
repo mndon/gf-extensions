@@ -2,10 +2,10 @@ package http
 
 import (
 	"context"
-	"gf-extensions/config"
 	jwt "github.com/gogf/gf-jwt/v2"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/util/gconv"
+	"github.com/mndon/gf-extensions/config"
 	"time"
 )
 

@@ -3,9 +3,9 @@ package config
 import (
 	"context"
 	"fmt"
+	"github.com/mndon/gf-extensions/config/utils"
 	"os"
 	"testing"
-	"tik_server/components/config/utils"
 )
 
 var (
