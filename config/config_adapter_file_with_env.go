@@ -2,8 +2,8 @@ package config
 
 import (
 	"context"
-	"gf-extensions/config/utils"
 	"github.com/gogf/gf/v2/os/gcfg"
+	"github.com/mndon/gf-extensions/config/utils"
 )
 
 type AdapterFileWithEnv struct {
