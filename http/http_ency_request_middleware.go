@@ -6,6 +6,7 @@ import (
 	"github.com/gogf/gf/v2/errors/gcode"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/net/ghttp"
+	"github.com/mndon/gf-extensions/http/internal"
 	"sort"
 	"strconv"
 	"time"
@@ -69,7 +70,7 @@ func encyRequest(r *ghttp.Request) {
 	// 加时间戳字符串
 	data = data + timestampInputStr
 	// 加盐
-	sign := Utils().md5Ency(data, defaultSalt)
+	sign := internal.Utils().Md5Ency(data, defaultSalt)
 	if sign != signInput {
 		g.Log().Warning(r.GetCtx(), fmt.Sprintf("sign invalided, data: %s, right sign: %s", data, sign))
 		SafeFiltering(r.GetCtx())

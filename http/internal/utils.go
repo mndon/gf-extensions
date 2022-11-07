@@ -1,4 +1,4 @@
-package http
+package internal
 
 import (
 	"crypto/md5"
@@ -15,7 +15,7 @@ func Utils() *utils {
 }
 
 // Md5Ency md5加密
-func (u utils) md5Ency(data string, salt string) string {
+func (u utils) Md5Ency(data string, salt string) string {
 	h := md5.New()
 	h.Write([]byte(data + salt))
 	result := hex.EncodeToString(h.Sum(nil))
