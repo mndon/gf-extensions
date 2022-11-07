@@ -1,6 +1,6 @@
 package http
 
 const (
-	HttpHeaderRemoteIp = "X-Real-Ip"
-	HttpHeaderUA       = "User-Agent"
+	HeaderRemoteIp = "X-Real-Ip"
+	HeaderUA       = "User-Agent"
 )
