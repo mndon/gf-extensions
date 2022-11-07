@@ -10,9 +10,12 @@ import (
 	"net/http"
 )
 
-func MiddlewareHandlerResponse(r *ghttp.Request) {
+func HandleResponseMiddleware(r *ghttp.Request) {
 	r.Middleware.Next()
+	handleResponse(r)
+}
 
+func handleResponse(r *ghttp.Request) {
 	// There's custom buffer content, it then exits current handler.
 	if r.Response.BufferLength() > 0 {
 		return
