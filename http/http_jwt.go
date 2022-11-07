@@ -18,7 +18,7 @@ func init() {
 		Key:             config.GetValueFromConfigWithPanic(ctx, JwtKey, "HihfiasdnfdsnfsdnfiHNfikadnfknsd").Bytes(),
 		Timeout:         time.Hour * config.GetValueFromConfigWithPanic(ctx, JwtTimeout, 24*30).Duration(),
 		MaxRefresh:      time.Hour * config.GetValueFromConfigWithPanic(ctx, JwtMaxRefresh, 24*120).Duration(),
-		IdentityKey:     config.GetValueFromConfigWithPanic(ctx, JwtIdentityKey, "Uid").String(),
+		IdentityKey:     config.GetValueFromConfigWithPanic(ctx, JwtIdentityKey, "uid").String(),
 		TokenLookup:     "header: Authorization",
 		TokenHeadName:   "Bearer",
 		TimeFunc:        time.Now,
