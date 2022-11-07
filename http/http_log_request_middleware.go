@@ -8,8 +8,8 @@ import (
 	"strings"
 )
 
-// MiddlewareLogReq 验证请求签名
-func MiddlewareLogReq(r *ghttp.Request) {
+// LogRequestMiddleware 验证请求签名
+func LogRequestMiddleware(r *ghttp.Request) {
 	uId := gconv.String(JwtAuth().GetIdentity(r.GetCtx()))
 	ua := strings.Join(r.Header[HttpHeaderUA], "; ")
 	ip := strings.Join(r.Header[HttpHeaderRemoteIp], "; ")
