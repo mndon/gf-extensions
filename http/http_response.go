@@ -1,8 +1,8 @@
 package http
 
-// HandlerResponse
+// Response
 // @Description: 响应结构体
-type HandlerResponse struct {
+type Response struct {
 	Status int         `json:"status"    dc:"Error code"`
 	Msg    string      `json:"msg" dc:"Error message"`
 	Remark string      `json:"remark" dc:"client tip message"`
