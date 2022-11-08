@@ -10,7 +10,7 @@ import (
 	"net/http"
 )
 
-func MiddlewareHandleResponse(r *ghttp.Request) {
+func MiddlewareHandlerResponse(r *ghttp.Request) {
 	r.Middleware.Next()
 	handleResponse(r)
 }
@@ -65,7 +65,7 @@ func handleResponse(r *ghttp.Request) {
 		code = CodeOk
 	}
 
-	internalErr := r.Response.WriteJson(Response{
+	internalErr := r.Response.WriteJson(HandlerResponse{
 		Status: code.Code(),
 		Remark: remark,
 		Msg:    msg,
