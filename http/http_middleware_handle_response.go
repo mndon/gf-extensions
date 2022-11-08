@@ -10,7 +10,7 @@ import (
 	"net/http"
 )
 
-func HandleResponseMiddleware(r *ghttp.Request) {
+func MiddlewareHandleResponse(r *ghttp.Request) {
 	r.Middleware.Next()
 	handleResponse(r)
 }
@@ -52,6 +52,8 @@ func handleResponse(r *ghttp.Request) {
 		// 捕获http错误响应码， 映射成自定义错误类型
 		msg = http.StatusText(r.Response.Status)
 		switch r.Response.Status {
+		case http.StatusUnauthorized:
+			code = CodeNotAuthorizedErr
 		case http.StatusNotFound:
 			code = CodeNotFoundErr
 		case http.StatusForbidden:
@@ -63,7 +65,7 @@ func handleResponse(r *ghttp.Request) {
 		code = CodeOk
 	}
 
-	internalErr := r.Response.WriteJson(HandlerResponse{
+	internalErr := r.Response.WriteJson(Response{
 		Status: code.Code(),
 		Remark: remark,
 		Msg:    msg,

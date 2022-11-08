@@ -2,11 +2,12 @@ package http
 
 import (
 	"context"
+	"crypto/md5"
+	"encoding/hex"
 	"fmt"
 	"github.com/gogf/gf/v2/errors/gcode"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/net/ghttp"
-	"github.com/mndon/gf-extensions/http/internal"
 	"sort"
 	"strconv"
 	"time"
@@ -18,8 +19,8 @@ const (
 	defaultSalt  = "a947e5fd22f041cd82923fff4362169c"
 )
 
-// EncyRequestMiddleware 验证请求签名中间件
-func EncyRequestMiddleware(r *ghttp.Request) {
+// MiddlewareEncyRequest 验证请求签名中间件
+func MiddlewareEncyRequest(r *ghttp.Request) {
 	encyRequest(r)
 	r.Middleware.Next()
 }
@@ -70,7 +71,7 @@ func encyRequest(r *ghttp.Request) {
 	// 加时间戳字符串
 	data = data + timestampInputStr
 	// 加盐
-	sign := internal.Utils().Md5Ency(data, defaultSalt)
+	sign := md5Ency(data, defaultSalt)
 	if sign != signInput {
 		g.Log().Warning(r.GetCtx(), fmt.Sprintf("sign invalided, data: %s, right sign: %s", data, sign))
 		SafeFiltering(r.GetCtx())
@@ -85,4 +86,12 @@ func SafeFiltering(ctx context.Context) {
 		Message: gcode.CodeSecurityReason.Message(),
 	})
 	r.ExitAll()
+}
+
+// md5加密
+func md5Ency(data string, salt string) string {
+	h := md5.New()
+	h.Write([]byte(data + salt))
+	result := hex.EncodeToString(h.Sum(nil))
+	return result
 }
