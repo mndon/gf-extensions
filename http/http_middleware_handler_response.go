@@ -6,7 +6,6 @@ import (
 	"github.com/gogf/gf/v2/errors/gerror"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/net/ghttp"
-	"github.com/gogf/gf/v2/util/gconv"
 	"net/http"
 )
 
@@ -16,7 +15,6 @@ func MiddlewareHandlerResponse(r *ghttp.Request) {
 }
 
 func handleResponse(r *ghttp.Request) {
-	// There's custom buffer content, it then exits current handler.
 	if r.Response.BufferLength() > 0 {
 		return
 	}
@@ -32,34 +30,37 @@ func handleResponse(r *ghttp.Request) {
 
 	if err != nil {
 		// 捕获错误类型， 返回响应状态码
-		switch err {
-		case sql.ErrNoRows:
-			code = CodeNotFoundErr
-		}
 
+		if code == gcode.CodeNil {
+			switch err {
+			case sql.ErrNoRows:
+				code = CodeNotFoundErr
+			default:
+				code = CodeInternalErr
+			}
+		} else {
+			// 捕获框架内置code， 映射成自定义code
+			switch code {
+			case gcode.CodeNil: //未知报错
+				code = CodeInternalErr
+			case gcode.CodeValidationFailed: // 参数校验失败
+				code = CodeInvalidParamErr
+			}
+		}
 		msg = err.Error()
-		remark = gconv.String(code.Detail())
-
-		// 捕获框架内置code， 映射成自定义code
-		switch code {
-		case gcode.CodeNil: //未知报错
-			code = CodeUnknownErr
-		case gcode.CodeValidationFailed: // 参数校验失败
-			code = CodeInvalidParamErr
-			remark = err.Error()
-		}
+		remark = code.Message()
 	} else if r.Response.Status > 0 && r.Response.Status != http.StatusOK {
 		// 捕获http错误响应码， 映射成自定义错误类型
 		msg = http.StatusText(r.Response.Status)
 		switch r.Response.Status {
 		case http.StatusUnauthorized:
-			code = CodeNotAuthorizedErr
+			code = CodeAuthorizedErr
 		case http.StatusNotFound:
 			code = CodeNotFoundErr
 		case http.StatusForbidden:
-			code = CodeNotAuthorizedErr
+			code = CodeAuthorizedErr
 		default:
-			code = CodeUnknownErr
+			code = CodeInternalErr
 		}
 	} else {
 		code = CodeOk

@@ -4,7 +4,6 @@ import (
 	"context"
 	jwt "github.com/gogf/gf-jwt/v2"
 	"github.com/gogf/gf/v2/frame/g"
-	"github.com/gogf/gf/v2/util/gconv"
 	"github.com/mndon/gf-extensions/config"
 	"time"
 )
@@ -67,11 +66,11 @@ func IdentityHandler(ctx context.Context) interface{} {
 // Unauthorized is used to define customized Unauthorized callback function.
 func Unauthorized(ctx context.Context, code int, message string) {
 	r := g.RequestFromCtx(ctx)
-	responseCode := CodeNotAuthorizedErr
+	responseCode := CodeAuthorizedErr
 	r.Response.WriteJson(HandlerResponse{
 		Status: responseCode.Code(),
-		Msg:    responseCode.Message(),
-		Remark: gconv.String(responseCode.Detail()),
+		Msg:    "Invalid token",
+		Remark: responseCode.Message(),
 	})
 	r.ExitAll()
 }
