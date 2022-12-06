@@ -55,7 +55,6 @@ func (c *sOss) DeleteObj(bucketName string, objName string) error {
 
 // SignUrl 签名上传路径
 func (c *sOss) SignUrl(bucketName string, objName string) (url string, err error) {
-	fmt.Println(c)
 	if bucketName == "" {
 		bucketName = c.defaultBucket
 	}

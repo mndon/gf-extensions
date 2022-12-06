@@ -16,6 +16,10 @@ func GetUaObjFromCtx(ctx context.Context) Ua {
 	}
 }
 
+func (u *Ua) GetUa() string {
+	return u.ua
+}
+
 func (u *Ua) GetChannelFormUA() string {
 	return u.GetValueFormUA(`Channel\((.*?)\)`)
 }
