@@ -58,12 +58,23 @@ func NewJwt(timeout int, maxRefresh int, jwtKey ...string) *Jwt {
 // TokenGenerator
 // @Description: token生成
 // @receiver j
-// @param data
+// @param userUid
 // @return string
 // @return time.Time
 // @return error
-func (j *Jwt) TokenGenerator(data interface{}) (string, time.Time, error) {
-	return j.jm.TokenGenerator(data)
+func (j *Jwt) TokenGenerator(userUid string) (string, time.Time, error) {
+	return j.jm.TokenGenerator(g.Map{j.IdentityKey: userUid})
+}
+
+// RefreshToken
+// @Description: token刷新
+// @receiver j
+// @param ctx
+// @return string
+// @return time.Time
+// @return error
+func (j Jwt) RefreshToken(ctx context.Context) (string, time.Time, error) {
+	return j.jm.RefreshToken(ctx)
 }
 
 // GetIdentity
