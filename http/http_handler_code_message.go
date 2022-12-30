@@ -13,7 +13,7 @@ const (
 var local string
 
 func Init() {
-	local = config.GetValueFromConfigWithPanic(context.TODO(), "local", en).String()
+	local = config.GetWithCmdFromCfgWithPanic(context.TODO(), "local", en).String()
 }
 
 type I18nMsg struct {
