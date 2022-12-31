@@ -13,7 +13,7 @@ const (
 var local string
 
 func Init() {
-	local = g.Cfg().MustGet(context.TODO(), "local", en).String()
+	local = g.Cfg().MustGetWithCmd(context.TODO(), "local", en).String()
 }
 
 type I18nMsg struct {
