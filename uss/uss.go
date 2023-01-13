@@ -97,7 +97,7 @@ func (u *Uss) GetObjUrl(objName string, cdn bool) (url string, err error) {
 	if cdn {
 		return u.BucketCdn + objName, nil
 	}
-	return u.BucketUrl, nil
+	return u.BucketUrl + objName, nil
 }
 
 func (u *Uss) getBucket() (*oss.Bucket, error) {
