@@ -2,7 +2,7 @@ package http
 
 import (
 	"context"
-	"github.com/mndon/gf-extensions/config"
+	"github.com/gogf/gf/v2/frame/g"
 )
 
 const (
@@ -13,7 +13,7 @@ const (
 var local string
 
 func Init() {
-	local = config.GetValueFromConfigWithPanic(context.TODO(), "local", en).String()
+	local = g.Cfg().MustGetWithCmd(context.TODO(), "local", en).String()
 }
 
 type I18nMsg struct {

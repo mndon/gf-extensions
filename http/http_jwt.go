@@ -4,48 +4,102 @@ import (
 	"context"
 	jwt "github.com/gogf/gf-jwt/v2"
 	"github.com/gogf/gf/v2/frame/g"
-	"github.com/mndon/gf-extensions/config"
+	"github.com/gogf/gf/v2/net/ghttp"
 	"time"
 )
 
-// jwt相关配置
 const (
-	JwtKey         = "jwt.key"
-	JwtTimeout     = "jwt.timeout"
-	JwtMaxRefresh  = "jwt.max_refresh"
-	JwtIdentityKey = "jwt.identity_key"
+	JwtDefaultSecretKey = "HihfiasdnfdsnfsdnfiHNikaniki"
+	JwtIdentityKey      = "uid" // 固定载荷 IdentityKey 为uid
 )
 
-var insJwt *jwt.GfJWTMiddleware
+type Jwt struct {
+	Timeout       int
+	MaxRefresh    int
+	IdentityKey   string
+	TokenLookup   string
+	TokenHeadName string
+	secretKey     string
+	jm            *jwt.GfJWTMiddleware
+}
 
-func init() {
-	ctx := context.TODO()
-	insJwt = jwt.New(&jwt.GfJWTMiddleware{
-		Realm:           "test zone",
-		Key:             config.GetValueFromConfigWithPanic(ctx, JwtKey, "HihfiasdnfdsnfsdnfiHNfikadnfknsd").Bytes(),
-		Timeout:         time.Hour * config.GetValueFromConfigWithPanic(ctx, JwtTimeout, 24*30).Duration(),
-		MaxRefresh:      time.Hour * config.GetValueFromConfigWithPanic(ctx, JwtMaxRefresh, 24*120).Duration(),
-		IdentityKey:     config.GetValueFromConfigWithPanic(ctx, JwtIdentityKey, "uid").String(),
-		TokenLookup:     "header: Authorization",
-		TokenHeadName:   "Bearer",
+func NewJwt(timeout int, maxRefresh int, jwtKey ...string) *Jwt {
+	key := JwtDefaultSecretKey
+	if len(jwtKey) == 1 {
+		key = jwtKey[0]
+	}
+
+	j := &Jwt{
+		Timeout:       timeout,
+		MaxRefresh:    maxRefresh,
+		IdentityKey:   JwtIdentityKey,
+		TokenLookup:   "header: Authorization",
+		TokenHeadName: "Bearer",
+		secretKey:     key,
+	}
+
+	j.jm = jwt.New(&jwt.GfJWTMiddleware{
+		Realm:           "jwt",
+		Key:             []byte(j.secretKey),
+		Timeout:         time.Hour * time.Duration(timeout),
+		MaxRefresh:      time.Hour * time.Duration(maxRefresh),
+		IdentityKey:     j.IdentityKey,
+		TokenLookup:     j.TokenLookup,
+		TokenHeadName:   j.TokenHeadName,
 		TimeFunc:        time.Now,
-		Unauthorized:    Unauthorized,
-		PayloadFunc:     PayloadFunc,
-		IdentityHandler: IdentityHandler,
+		Unauthorized:    j.unauthorized,
+		PayloadFunc:     j.payloadFunc,
+		IdentityHandler: j.identityHandler,
 	})
+
+	return j
 }
 
-func JwtAuth() *jwt.GfJWTMiddleware {
-	return insJwt
+// TokenGenerator
+// @Description: token生成
+// @receiver j
+// @param userUid
+// @return string
+// @return time.Time
+// @return error
+func (j *Jwt) TokenGenerator(userUid string) (string, time.Time, error) {
+	return j.jm.TokenGenerator(g.Map{j.IdentityKey: userUid})
 }
 
-// PayloadFunc is a callback function that will be called during login.
-// Using this function it is possible to add additional payload data to the webtoken.
-// The data is then made available during requests via c.Get("JWT_PAYLOAD").
-// Note that the payload is not encrypted.
-// The attributes mentioned on jwt.io can't be used as keys for the map.
-// Optional, by default no additional data will be set.
-func PayloadFunc(data interface{}) jwt.MapClaims {
+// RefreshToken
+// @Description: token刷新
+// @receiver j
+// @param ctx
+// @return string
+// @return time.Time
+// @return error
+func (j Jwt) RefreshToken(ctx context.Context) (string, time.Time, error) {
+	return j.jm.RefreshToken(ctx)
+}
+
+// GetIdentity
+// @Description: 获取jwt载荷中Identity字段的值
+// @receiver j
+// @param ctx
+// @return interface{}
+func (j *Jwt) GetIdentity(ctx context.Context) interface{} {
+	return j.jm.GetIdentity(ctx)
+}
+
+// BuildMiddlewareJwtAuth
+// @Description: 生成jwt鉴权中间件
+// @receiver j
+// @param r
+func (j *Jwt) BuildMiddlewareJwtAuth(r *ghttp.Request) {
+	j.jm.MiddlewareFunc()(r)
+	r.Middleware.Next()
+}
+
+// payloadFunc
+// @Description: 载荷方法
+// @param data
+// @return jwt.MapClaims
+func (j *Jwt) payloadFunc(data interface{}) jwt.MapClaims {
 	claims := jwt.MapClaims{}
 	params := data.(map[string]interface{})
 	if len(params) > 0 {
@@ -56,21 +110,31 @@ func PayloadFunc(data interface{}) jwt.MapClaims {
 	return claims
 }
 
-// IdentityHandler get the identity from JWT and set the identity for every request
-// Using this function, by r.GetParam("id") get identity
-func IdentityHandler(ctx context.Context) interface{} {
+// identityHandler
+// @Description: 身份验证回调
+// @param ctx
+// @return interface{}
+func (j *Jwt) identityHandler(ctx context.Context) interface{} {
 	claims := jwt.ExtractClaims(ctx)
-	return claims[insJwt.IdentityKey]
+	return claims[j.jm.IdentityKey]
 }
 
-// Unauthorized is used to define customized Unauthorized callback function.
-func Unauthorized(ctx context.Context, code int, message string) {
+// unauthorized
+// @Description: 鉴权失败回调
+// @receiver j
+// @param ctx
+// @param code
+// @param message
+func (j *Jwt) unauthorized(ctx context.Context, code int, message string) {
 	r := g.RequestFromCtx(ctx)
-	responseCode := CodeAuthorizedErr
-	r.Response.WriteJson(HandlerResponse{
-		Status: responseCode.Code(),
-		Msg:    "Invalid token",
-		Remark: responseCode.Message(),
-	})
-	r.ExitAll()
+	r.SetError(NotAuthorizedErr("Invalid token"))
+}
+
+// GetIdentityFromJwtFromCtx
+// @Description: 从上下文中获取jwt携带得uid
+// @param ctx
+// @return string
+func GetIdentityFromJwtFromCtx(ctx context.Context) string {
+	r := g.RequestFromCtx(ctx)
+	return r.Get(JwtIdentityKey).String()
 }
