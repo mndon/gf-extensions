@@ -138,3 +138,12 @@ func GetIdentityFromJwtFromCtx(ctx context.Context) string {
 	r := g.RequestFromCtx(ctx)
 	return r.Get(JwtIdentityKey).String()
 }
+
+// SetIdentityInCtx
+// @Description: 设置上下文中的uid
+// @param ctx
+// @return string
+func SetIdentityInCtx(ctx context.Context, uid string) {
+	r := g.RequestFromCtx(ctx)
+	r.SetParam(JwtIdentityKey, uid)
+}
