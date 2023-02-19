@@ -5,6 +5,7 @@ import (
 	jwt "github.com/gogf/gf-jwt/v2"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/net/ghttp"
+	"net/http"
 	"time"
 )
 
@@ -116,7 +117,11 @@ func (j *Jwt) payloadFunc(data interface{}) jwt.MapClaims {
 // @return interface{}
 func (j *Jwt) identityHandler(ctx context.Context) interface{} {
 	claims := jwt.ExtractClaims(ctx)
-	return claims[j.jm.IdentityKey]
+	i := claims[j.jm.IdentityKey]
+	if i == nil || i == "" || i == 0 {
+		return nil
+	}
+	return i
 }
 
 // unauthorized
@@ -128,6 +133,7 @@ func (j *Jwt) identityHandler(ctx context.Context) interface{} {
 func (j *Jwt) unauthorized(ctx context.Context, code int, message string) {
 	r := g.RequestFromCtx(ctx)
 	r.SetError(NotAuthorizedErr("Invalid token"))
+	r.Response.Status = http.StatusOK
 }
 
 // GetIdentityFromJwtFromCtx
