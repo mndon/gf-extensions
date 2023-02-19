@@ -39,7 +39,7 @@ func MiddlewareLogRequest(r *ghttp.Request) {
 		logStr := fmt.Sprintf(logFormat, uri, url, method, body, ip, token, uId, ua, fmt.Sprintf(errorLogFormat, r.Response.BufferString(), err))
 		g.Log().Errorf(ctx, logStr)
 	} else {
-		logStr := fmt.Sprintf(logFormat, uri, url, method, body, ip, token, uId, ua, "", "")
+		logStr := fmt.Sprintf(logFormat, uri, url, method, body, ip, token, uId, ua, "")
 		g.Log().Info(ctx, logStr)
 	}
 }
