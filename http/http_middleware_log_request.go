@@ -16,8 +16,10 @@ ip : %s
 token : %s
 userUid : %s
 userAgent : %s 
-=================[/API_CALL]=================
+%s=================[/API_CALL]=================
 `
+
+const errorLogFormat = "res: %s\nerr: %+v"
 
 // MiddlewareLogRequest 验证请求签名
 func MiddlewareLogRequest(r *ghttp.Request) {
@@ -33,6 +35,11 @@ func MiddlewareLogRequest(r *ghttp.Request) {
 	token := r.Header.Get(HeaderAuthorization)
 	ua := GetUaFromCtx(ctx)
 
-	logStr := fmt.Sprintf(logFormat, uri, url, method, body, ip, token, uId, ua)
-	g.Log().Info(ctx, logStr)
+	if err := r.GetError(); err != nil {
+		logStr := fmt.Sprintf(logFormat, uri, url, method, body, ip, token, uId, ua, fmt.Sprintf(errorLogFormat, r.Response.BufferString(), err))
+		g.Log().Errorf(ctx, logStr)
+	} else {
+		logStr := fmt.Sprintf(logFormat, uri, url, method, body, ip, token, uId, ua, "", "")
+		g.Log().Info(ctx, logStr)
+	}
 }
