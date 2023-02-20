@@ -15,8 +15,6 @@ const (
 )
 
 type Jwt struct {
-	Timeout       int
-	MaxRefresh    int
 	IdentityKey   string
 	TokenLookup   string
 	TokenHeadName string
@@ -25,14 +23,18 @@ type Jwt struct {
 }
 
 func NewJwt(timeout int, maxRefresh int, jwtKey ...string) *Jwt {
+	timeoutDuration := time.Hour * time.Duration(timeout)
+	maxRefreshDuration := time.Hour * time.Duration(maxRefresh)
+	return NewJwtWithTimeDuration(timeoutDuration, maxRefreshDuration, jwtKey...)
+}
+
+func NewJwtWithTimeDuration(timeout time.Duration, maxRefresh time.Duration, jwtKey ...string) *Jwt {
 	key := JwtDefaultSecretKey
 	if len(jwtKey) == 1 {
 		key = jwtKey[0]
 	}
 
 	j := &Jwt{
-		Timeout:       timeout,
-		MaxRefresh:    maxRefresh,
 		IdentityKey:   JwtIdentityKey,
 		TokenLookup:   "header: Authorization",
 		TokenHeadName: "Bearer",
@@ -42,8 +44,8 @@ func NewJwt(timeout int, maxRefresh int, jwtKey ...string) *Jwt {
 	j.jm = jwt.New(&jwt.GfJWTMiddleware{
 		Realm:           "jwt",
 		Key:             []byte(j.secretKey),
-		Timeout:         time.Hour * time.Duration(timeout),
-		MaxRefresh:      time.Hour * time.Duration(maxRefresh),
+		Timeout:         timeout,
+		MaxRefresh:      maxRefresh,
 		IdentityKey:     j.IdentityKey,
 		TokenLookup:     j.TokenLookup,
 		TokenHeadName:   j.TokenHeadName,
