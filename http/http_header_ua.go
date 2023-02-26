@@ -36,6 +36,10 @@ func (u *Ua) GetBrandFormUA() string {
 	return u.GetValueFormUA(`Brand\((.*?)\)`)
 }
 
+func (u *Ua) GetModelFormUA() string {
+	return u.GetValueFormUA(`Model\((.*?)\)`)
+}
+
 func (u *Ua) GetValueFormUA(matchKey string) string {
 	brandReg := regexp.MustCompile(matchKey)
 	result := brandReg.FindStringSubmatch(u.ua)
