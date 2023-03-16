@@ -3,6 +3,7 @@ package uss
 import (
 	"errors"
 	"github.com/aliyun/aliyun-oss-go-sdk/oss"
+	"github.com/mndon/gf-extensions/http"
 	"strings"
 )
 
@@ -111,4 +112,24 @@ func (u *Uss) getBucket() (*oss.Bucket, error) {
 		return nil, err
 	}
 	return bucket, nil
+}
+
+func (u *Uss) GetObjectToFile(objName string, filePath string) (err error) {
+	bucket, err := u.getBucket()
+	if err != nil {
+		return err
+	}
+	exist, err := bucket.IsObjectExist(objName)
+	if err != nil {
+		return err
+	}
+	if !exist {
+		return http.InvalidParamErr("file not found")
+	}
+	err = bucket.GetObjectToFile(objName, filePath)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
