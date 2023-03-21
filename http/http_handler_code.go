@@ -8,4 +8,6 @@ var (
 	CodeNotFoundErr     = gcode.New(4040, NoSuchResourceMsg.GetMsg(), nil)
 	CodeInvalidParamErr = gcode.New(4000, InvalidParamMsg.GetMsg(), nil)
 	CodeInternalErr     = gcode.New(5000, InternalErrorMsg.GetMsg(), nil)
+
+	LoginLimitErr = gcode.New(4011, LoginLimitMsg.GetMsg(), nil)
 )
