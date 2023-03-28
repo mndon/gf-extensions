@@ -25,20 +25,20 @@ func NewErrWithCode(code gcode.Code, msg string, remark ...string) error {
 
 // NotAuthorizedErr 鉴权失败err
 func NotAuthorizedErr(msg string, remark ...string) error {
-	return NewErrWithCode(CodeAuthorizedErr, msg)
+	return NewErrWithCode(CodeAuthorizedErr, msg, remark...)
 }
 
 // NotFoundErr 无此资源err
 func NotFoundErr(msg string, remark ...string) error {
-	return NewErrWithCode(CodeNotFoundErr, msg)
+	return NewErrWithCode(CodeNotFoundErr, msg, remark...)
 }
 
 // InvalidParamErr 入参错误err
 func InvalidParamErr(msg string, remark ...string) error {
-	return NewErrWithCode(CodeInvalidParamErr, msg)
+	return NewErrWithCode(CodeInvalidParamErr, msg, remark...)
 }
 
 // InternalErr 服务端错误err
 func InternalErr(msg string, remark ...string) error {
-	return NewErrWithCode(CodeInternalErr, msg)
+	return NewErrWithCode(CodeInternalErr, msg, remark...)
 }
