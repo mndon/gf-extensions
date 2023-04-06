@@ -3,6 +3,7 @@ package http
 import (
 	"context"
 	gjwt "github.com/gogf/gf-jwt/v2"
+	"github.com/gogf/gf/v2/container/gvar"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/net/ghttp"
 	"github.com/gogf/gf/v2/os/gcache"
@@ -63,6 +64,7 @@ func NewJwtWithTimeDuration(timeout time.Duration, maxRefresh time.Duration, log
 		TokenLookup:     j.TokenLookup,
 		TokenHeadName:   j.TokenHeadName,
 		TimeFunc:        time.Now,
+		Authorizator:    j.authorized,
 		Unauthorized:    j.unauthorized,
 		PayloadFunc:     j.payloadFunc,
 		IdentityHandler: j.identityHandler,
@@ -105,12 +107,13 @@ func (j *JwtAuth) RefreshToken(ctx context.Context) (string, time.Time, error) {
 	if err != nil {
 		return "", time.Now(), err
 	}
-	userUid := gconv.String(claims[j.IdentityKey])
-	if userUid == "" {
+	authorized := j.authorized(claims[j.IdentityKey], ctx)
+	if !authorized {
 		return "", time.Time{}, NotAuthorizedErr("token invalid")
 	}
 
-	token, expire, err := j.buildJwt(g.Map{j.IdentityKey: g.Map{j.IdentityKey: userUid}})
+	userUid := gconv.String(claims[j.IdentityKey])
+	token, expire, err := j.buildJwt(g.Map{j.IdentityKey: userUid})
 	if err != nil {
 		return "", time.Time{}, err
 	}
@@ -257,6 +260,14 @@ func (j *JwtAuth) identityHandler(ctx context.Context) interface{} {
 		return nil
 	}
 	return i
+}
+
+func (j *JwtAuth) authorized(data interface{}, ctx context.Context) bool {
+	iStr := gvar.New(data).String()
+	if len(iStr) != 32 {
+		return false
+	}
+	return true
 }
 
 // unauthorized
