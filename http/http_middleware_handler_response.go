@@ -29,26 +29,23 @@ func handleResponse(r *ghttp.Request) {
 	)
 
 	if err != nil {
-		// 捕获错误类型， 返回响应状态码
-
-		if code == gcode.CodeNil {
+		// 捕获框架内置code， 映射成自定义code
+		switch code {
+		case gcode.CodeNil: //未知报错
 			switch err {
 			case sql.ErrNoRows:
 				code = CodeNotFoundErr
 			default:
 				code = CodeInternalErr
 			}
-		} else {
-			// 捕获框架内置code， 映射成自定义code
-			switch code {
-			case gcode.CodeNil: //未知报错
-				code = CodeInternalErr
-			case gcode.CodeValidationFailed: // 参数校验失败
-				code = CodeInvalidParamErr
-			}
+			remark = code.Message()
+		case gcode.CodeValidationFailed: // 参数校验失败
+			code = CodeInvalidParamErr
+			remark = err.Error()
+		default:
+			remark = code.Message()
 		}
 		msg = err.Error()
-		remark = code.Message()
 	} else if r.Response.Status > 0 && r.Response.Status != http.StatusOK {
 		// 捕获http错误响应码， 映射成自定义错误类型
 		msg = http.StatusText(r.Response.Status)
