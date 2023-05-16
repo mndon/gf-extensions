@@ -1,4 +1,4 @@
-package http
+package httpx
 
 import (
 	"context"
@@ -38,6 +38,10 @@ func (u *Ua) GetBrandFormUA() string {
 
 func (u *Ua) GetModelFormUA() string {
 	return u.GetValueFormUA(`Model\((.*?)\)`)
+}
+
+func (u *Ua) GetPassportFormUA() string {
+	return u.GetValueFormUA(`Passport\((.*?)\)`)
 }
 
 func (u *Ua) GetValueFormUA(matchKey string) string {

@@ -1,4 +1,4 @@
-package http
+package httpx
 
 import (
 	"context"
@@ -177,15 +177,6 @@ func (j *JwtAuth) addTokenToCache(ctx context.Context, userUid string, token str
 	return nil
 }
 
-// GetIdentity
-// @Description: 获取jwt载荷中Identity字段的值
-// @receiver j
-// @param ctx
-// @return interface{}
-func (j *JwtAuth) GetIdentity(ctx context.Context) interface{} {
-	return j.mw.GetIdentity(ctx)
-}
-
 // BuildMiddlewareJwtAuth
 // @Description: 生成jwt鉴权中间件
 // @receiver j
@@ -196,7 +187,7 @@ func (j *JwtAuth) BuildMiddlewareJwtAuth(r *ghttp.Request) {
 
 	// 多设备限制登录
 	if j.loginLimitOption.LimitLogin {
-		userUid := gconv.String(j.GetIdentity(r.GetCtx()))
+		userUid := GetIdentityFromCtx(r.GetCtx())
 		cacheKey := j.buildCacheKey(userUid)
 		l, err := j.loginLimitOption.Cache.Get(r.GetCtx(), cacheKey)
 		if err != nil {
@@ -282,11 +273,11 @@ func (j *JwtAuth) unauthorized(ctx context.Context, code int, message string) {
 	r.Response.Status = http.StatusOK
 }
 
-// GetIdentityFromJwtFromCtx
+// GetIdentityFromCtx
 // @Description: 从上下文中获取jwt携带得uid
 // @param ctx
 // @return string
-func GetIdentityFromJwtFromCtx(ctx context.Context) string {
+func GetIdentityFromCtx(ctx context.Context) string {
 	r := g.RequestFromCtx(ctx)
 	return r.Get(JwtIdentityKey).String()
 }

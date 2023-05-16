@@ -1,4 +1,4 @@
-package http
+package httpx
 
 import (
 	"fmt"
@@ -31,7 +31,7 @@ func MiddlewareLogRequest(r *ghttp.Request) {
 	method := r.Method
 	body := r.GetBodyString()
 	ip := GetRemoteIpFromCtx(ctx)
-	uId := GetIdentityFromJwtFromCtx(ctx)
+	uId := GetIdentityFromCtx(ctx)
 	token := r.Header.Get(HeaderAuthorization)
 	ua := GetUaFromCtx(ctx)
 

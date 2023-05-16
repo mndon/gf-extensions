@@ -1,4 +1,4 @@
-package http
+package httpx
 
 var (
 	AuthenticationFailedMsg = I18nMsg{"验证用户身份失败，请重新登录", "User authentication failed, please log in again"}
