@@ -1,4 +1,4 @@
-package http
+package httpx
 
 import "github.com/gogf/gf/v2/errors/gcode"
 
