@@ -2,44 +2,30 @@ package httpx
 
 import (
 	"fmt"
+	"github.com/gogf/gf/v2/errors/gerror"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/net/ghttp"
+	"github.com/gogf/gf/v2/os/gtime"
 )
-
-const logFormat = `
-=================[API_CALL]=================
-uri : %s
-url : %s
-method : %s
-body : %s
-ip : %s
-token : %s
-userUid : %s
-userAgent : %s 
-%s=================[/API_CALL]=================
-`
-
-const errorLogFormat = "res: %s\nerr: %+v"
 
 // MiddlewareLogRequest 验证请求签名
 func MiddlewareLogRequest(r *ghttp.Request) {
 	r.Middleware.Next()
 
 	ctx := r.GetCtx()
-	uri := r.Router.Uri
-	url := r.URL.String()
-	method := r.Method
-	body := r.GetBodyString()
-	ip := GetRemoteIpFromCtx(ctx)
-	uId := GetIdentityFromCtx(ctx)
-	token := r.Header.Get(HeaderAuthorization)
-	ua := GetUaFromCtx(ctx)
+	content := fmt.Sprintf(
+		`%d "%s %s %s" "%s" %.3f, "%s", "%s", "%s", "%s"`,
+		r.Response.Status, r.Method, r.Router.Uri, r.URL.String(), r.GetBodyString(), float64(gtime.TimestampMilli()-r.EnterTime)/1000,
+		GetRemoteIpFromCtx(ctx), GetIdentityFromCtx(ctx), r.UserAgent(), r.Header.Get(HeaderAuthorization),
+	)
 
 	if err := r.GetError(); err != nil {
-		logStr := fmt.Sprintf(logFormat, uri, url, method, body, ip, token, uId, ua, fmt.Sprintf(errorLogFormat, r.Response.BufferString(), err))
-		g.Log().Warningf(ctx, logStr)
-	} else {
-		logStr := fmt.Sprintf(logFormat, uri, url, method, body, ip, token, uId, ua, "")
-		g.Log().Info(ctx, logStr)
+		content += fmt.Sprintf(`, "%s"`, r.Response.BufferString())
+		if stack := gerror.Stack(err); stack != "" {
+			content += "\nStack:\n" + stack
+		} else {
+			content += ", " + err.Error()
+		}
 	}
+	g.Log().Print(ctx, content)
 }
