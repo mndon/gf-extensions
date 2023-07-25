@@ -3,7 +3,6 @@ package httpx
 import (
 	"context"
 	"github.com/gogf/gf/v2/net/ghttp"
-	"strings"
 )
 
 const (
@@ -14,10 +13,16 @@ const (
 
 func GetRemoteIpFromCtx(ctx context.Context) string {
 	r := ghttp.RequestFromCtx(ctx)
-	return strings.Join(r.Header[HeaderRemoteIp], "; ")
+	if r != nil {
+		return r.Header.Get(HeaderRemoteIp)
+	}
+	return ""
 }
 
 func GetUaFromCtx(ctx context.Context) string {
 	r := ghttp.RequestFromCtx(ctx)
-	return strings.Join(r.Header[HeaderUA], "; ")
+	if r != nil {
+		return r.Header.Get(HeaderUA)
+	}
+	return ""
 }
