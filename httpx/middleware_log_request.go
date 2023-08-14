@@ -14,7 +14,7 @@ func MiddlewareLogRequest(r *ghttp.Request) {
 
 	ctx := r.GetCtx()
 	content := fmt.Sprintf(
-		`%d "%s %s %s" "%s" %.3f, "%s", "%s", "%s", "%s"`,
+		`[ACCESS] %d "%s %s %s" "%s" %.3f, "%s", "%s", "%s", "%s"`,
 		r.Response.Status, r.Method, r.Router.Uri, r.URL.String(), r.GetBodyString(), float64(gtime.TimestampMilli()-r.EnterTime)/1000,
 		GetRemoteIpFromCtx(ctx), GetIdentityFromCtx(ctx), r.UserAgent(), r.Header.Get(HeaderAuthorization),
 	)
