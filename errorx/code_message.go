@@ -1,4 +1,4 @@
-package httpx
+package errorx
 
 import (
 	"context"

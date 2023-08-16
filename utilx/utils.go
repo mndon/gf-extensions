@@ -1,8 +1,8 @@
-package utils
+package utilx
 
 import "sort"
 
-func StrListIn(target string, strArray []string) bool {
+func StringsIn(target string, strArray []string) bool {
 	sort.Strings(strArray)
 	index := sort.SearchStrings(strArray, target)
 	if index < len(strArray) && strArray[index] == target {

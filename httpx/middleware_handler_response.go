@@ -6,6 +6,7 @@ import (
 	"github.com/gogf/gf/v2/errors/gerror"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/net/ghttp"
+	"github.com/mndon/gf-extensions/errorx"
 	"net/http"
 )
 
@@ -34,13 +35,13 @@ func handleResponse(r *ghttp.Request) {
 		case gcode.CodeNil: //未知报错
 			switch err {
 			case sql.ErrNoRows:
-				code = CodeNotFoundErr
+				code = errorx.CodeNotFoundErr
 			default:
-				code = CodeInternalErr
+				code = errorx.CodeInternalErr
 			}
 			remark = code.Message()
 		case gcode.CodeValidationFailed: // 参数校验失败
-			code = CodeInvalidParamErr
+			code = errorx.CodeBadRequestErr
 			remark = err.Error()
 		default:
 			remark = code.Message()
@@ -51,16 +52,16 @@ func handleResponse(r *ghttp.Request) {
 		msg = http.StatusText(r.Response.Status)
 		switch r.Response.Status {
 		case http.StatusUnauthorized:
-			code = CodeAuthorizedErr
+			code = errorx.CodeAuthorizedErr
 		case http.StatusNotFound:
-			code = CodeNotFoundErr
+			code = errorx.CodeNotFoundErr
 		case http.StatusForbidden:
-			code = CodeAuthorizedErr
+			code = errorx.CodeAuthorizedErr
 		default:
-			code = CodeInternalErr
+			code = errorx.CodeInternalErr
 		}
 	} else {
-		code = CodeOk
+		code = errorx.CodeOk
 	}
 
 	internalErr := r.Response.WriteJson(HandlerResponse{

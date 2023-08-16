@@ -3,7 +3,7 @@ package sessionx
 import (
 	"context"
 	"github.com/gogf/gf/v2/frame/g"
-	"github.com/mndon/gf-extensions/httpx"
+	"github.com/mndon/gf-extensions/errorx"
 )
 
 const (
@@ -58,7 +58,7 @@ func GetUserWithOpt[T any](ctx context.Context, opt Opt) (user *T, err error) {
 	// 获取用户
 	uid := GetUserUid(ctx)
 	if uid == "" {
-		return nil, httpx.InternalErr("get user uid error")
+		return nil, errorx.InternalErr("get user uid error")
 	}
 	newU, err := sessionUtils.userService.InternalGetUserByUid(ctx, uid)
 	if err != nil {
@@ -70,7 +70,7 @@ func GetUserWithOpt[T any](ctx context.Context, opt Opt) (user *T, err error) {
 		r.SetParam(ctxUserKey, newU)
 		return v, nil
 	default:
-		return nil, httpx.InternalErr("get user error")
+		return nil, errorx.InternalErr("get user error")
 	}
 }
 

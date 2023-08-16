@@ -3,7 +3,7 @@ package uss
 import (
 	"errors"
 	"github.com/aliyun/aliyun-oss-go-sdk/oss"
-	"github.com/mndon/gf-extensions/httpx"
+	"github.com/mndon/gf-extensions/errorx"
 	"strings"
 )
 
@@ -124,7 +124,7 @@ func (u *Uss) GetObjectToFile(objName string, filePath string) (err error) {
 		return err
 	}
 	if !exist {
-		return httpx.InvalidParamErr("file not found")
+		return errorx.BadRequestErr("file not found")
 	}
 	err = bucket.GetObjectToFile(objName, filePath)
 	if err != nil {
