@@ -10,6 +10,7 @@ import (
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/net/ghttp"
 	"github.com/gogf/gf/v2/os/gcache"
+	"github.com/mndon/gf-extensions/errorx"
 	"time"
 )
 
@@ -88,7 +89,7 @@ func encyRequest(r *ghttp.Request) {
 // SafetyFiltering 安全限制异常返回
 func SafetyFiltering(ctx context.Context, msg string) {
 	r := g.RequestFromCtx(ctx)
-	r.SetError(NewErr(gcode.CodeSecurityReason.Code(), msg))
+	r.SetError(errorx.NewErr(gcode.CodeSecurityReason.Code(), msg))
 	r.Response.WriteJson(ghttp.DefaultHandlerResponse{
 		Code:    gcode.CodeSecurityReason.Code(),
 		Message: msg,
