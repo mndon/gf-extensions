@@ -23,7 +23,7 @@ const (
 var blacklist = gcache.New()
 
 func getExpire() int64 {
-	return g.Cfg().MustGet(context.TODO(), "safetyMiddleware.exp", 600*1000).Int64()
+	return g.Cfg().MustGet(context.TODO(), "safetyMiddleware.exp", 60*1000).Int64()
 }
 
 func getSalt() string {
@@ -48,10 +48,11 @@ func encyRequest(r *ghttp.Request) {
 	// 校验签名时效性
 	timestamp := gvar.New(timestampStr).Int64()
 	now := time.Now().UnixMilli()
-	if (timestamp + getExpire()) < now {
+	if timestamp < (now - getExpire()) {
 		SafetyFiltering(r.GetCtx(), "timestamp expired")
 	}
 	if timestamp > now {
+		g.Log().Warningf(r.GetCtx(), "timestamp invalided: timestamp: %+v, now: %+v")
 		SafetyFiltering(r.GetCtx(), "timestamp invalided")
 	}
 	// 校验nonce
