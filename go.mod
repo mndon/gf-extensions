@@ -4,7 +4,6 @@ go 1.18
 
 require (
 	github.com/aliyun/aliyun-oss-go-sdk v2.2.5+incompatible
-	github.com/gogf/gf-jwt/v2 v2.0.1
 	github.com/gogf/gf/v2 v2.0.6
 	github.com/golang-jwt/jwt/v4 v4.3.0
 	github.com/jinzhu/copier v0.3.5
