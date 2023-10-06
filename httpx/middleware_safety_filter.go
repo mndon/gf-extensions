@@ -51,7 +51,7 @@ func encyRequest(r *ghttp.Request) {
 	if timestamp < (now - getExpire()) {
 		SafetyFiltering(r.GetCtx(), "timestamp expired")
 	}
-	if timestamp > now {
+	if timestamp > (now + 30000) { //冗余30秒
 		g.Log().Warningf(r.GetCtx(), "timestamp invalided: timestamp: %+v, now: %+v", timestamp, now)
 		SafetyFiltering(r.GetCtx(), "timestamp invalided")
 	}
