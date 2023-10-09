@@ -32,6 +32,8 @@ type JwtOption struct {
 	LimitCount  int           // 限制设备数
 	CachePrefix string        //缓存key前缀
 	Cache       *gcache.Cache //缓存
+
+	RefreshTokenCustomerCheck func(ctx context.Context, uid string) error
 }
 
 type JwtAuth struct {
@@ -119,6 +121,12 @@ func (j *JwtAuth) RefreshToken(ctx context.Context) (string, time.Time, error) {
 	userUid := gconv.String(claims[j.IdentityKey])
 	if userUid == "" {
 		return "", time.Time{}, errorx.BadRequestErr("token invalid", errorx.CodeAuthorizedErr.Message())
+	}
+	if j.jwtOption.RefreshTokenCustomerCheck != nil {
+		err := j.jwtOption.RefreshTokenCustomerCheck(ctx, userUid)
+		if err != nil {
+			return "", time.Time{}, err
+		}
 	}
 
 	token, expire, err := j.buildJwt(g.Map{j.IdentityKey: userUid})
