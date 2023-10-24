@@ -87,6 +87,13 @@ func (u *Uss) IsObjExist(objName string) (exist bool, err error) {
 	return exist, nil
 }
 
+// GetObjUrl
+// @Description:获取文件下载地址
+// @receiver u
+// @param objName
+// @param cdn
+// @return url
+// @return err
 func (u *Uss) GetObjUrl(objName string, cdn bool) (url string, err error) {
 	exist, err := u.IsObjExist(objName)
 	if err != nil {
@@ -114,6 +121,12 @@ func (u *Uss) getBucket() (*oss.Bucket, error) {
 	return bucket, nil
 }
 
+// GetObjectToFile
+// @Description: 下载文件
+// @receiver u
+// @param objName
+// @param filePath
+// @return err
 func (u *Uss) GetObjectToFile(objName string, filePath string) (err error) {
 	bucket, err := u.getBucket()
 	if err != nil {
@@ -132,4 +145,24 @@ func (u *Uss) GetObjectToFile(objName string, filePath string) (err error) {
 	}
 
 	return nil
+}
+
+func (u *Uss) GetObjectMd5(objName string) (md5 string, err error) {
+	bucket, err := u.getBucket()
+	if err != nil {
+		return "", err
+	}
+	exist, err := bucket.IsObjectExist(objName)
+	if err != nil {
+		return "", err
+	}
+	if !exist {
+		return "", errorx.BadRequestErr("file not found")
+	}
+	meta, err := bucket.GetObjectMeta(objName)
+	if err != nil {
+		return "", err
+	}
+
+	return meta["Etag"][0], nil
 }
