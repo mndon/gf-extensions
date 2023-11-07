@@ -3,6 +3,7 @@ package httpx
 import (
 	"context"
 	"regexp"
+	"strings"
 )
 
 type Ua struct {
@@ -20,27 +21,27 @@ func (u *Ua) GetUa() string {
 	return u.ua
 }
 
-func (u *Ua) GetChannelFormUA() string {
+func (u *Ua) GetChannel() string {
 	return u.GetValueFormUA(`Channel\((.*?)\)`)
 }
 
-func (u *Ua) GetPlatformFormUA() string {
+func (u *Ua) GetPlatform() string {
 	return u.GetValueFormUA(`Platfom\((.*?)\)`)
 }
 
-func (u *Ua) GetAppVersionFormUA() string {
+func (u *Ua) GetAppVersion() string {
 	return u.GetValueFormUA(`App Version\((.*?)\)`)
 }
 
-func (u *Ua) GetBrandFormUA() string {
+func (u *Ua) GetBrand() string {
 	return u.GetValueFormUA(`Brand\((.*?)\)`)
 }
 
-func (u *Ua) GetModelFormUA() string {
+func (u *Ua) GetModel() string {
 	return u.GetValueFormUA(`Model\((.*?)\)`)
 }
 
-func (u *Ua) GetPassportFormUA() string {
+func (u *Ua) GetPassport() string {
 	return u.GetValueFormUA(`Passport\((.*?)\)`)
 }
 
@@ -48,7 +49,7 @@ func (u *Ua) GetValueFormUA(matchKey string) string {
 	brandReg := regexp.MustCompile(matchKey)
 	result := brandReg.FindStringSubmatch(u.ua)
 	if result != nil && len(result) == 2 {
-		return result[1]
+		return strings.ToUpper(result[1])
 	}
 	return ""
 }
