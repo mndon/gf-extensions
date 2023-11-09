@@ -26,7 +26,8 @@ func (u *Ua) GetChannel() string {
 }
 
 func (u *Ua) GetPlatform() string {
-	return u.GetValueFormUA(`Platfom\((.*?)\)`)
+	// 兼容早期字段单词错误Platfom
+	return u.GetValueFormUA(`Platfo.?m\((.*?)\)`)
 }
 
 func (u *Ua) GetAppVersion() string {
