@@ -214,16 +214,36 @@ func Clone[T any](s []T) []T {
 	return c
 }
 
+// SortFunc
+// @Description: 排序
+// @param s
+// @param less
+// @return []T
 func SortFunc[T any](s []T, less func(a T, b T) bool) []T {
 	c := Clone(s)
 	quickSortFunc(c, 0, len(c)-1, less)
 	return c
 }
 
-// Sort creates a new slice that is sorted in ascending order. The
+// Sort
+// @Description: 排序
+// @param s
+// @return []T
 // given slice is not changed.
 func Sort[T ordered](s []T) []T {
 	c := Clone(s)
 	quickSort(c, 0, len(s)-1)
 	return c
+}
+
+// Reverse
+// @Description: 反转
+// @param s
+// @return []T
+func Reverse[T any](s []T) []T {
+	res := make([]T, len(s))
+	for i := 0; i < len(s); i++ {
+		res[i] = s[len(s)-1-i]
+	}
+	return res
 }
