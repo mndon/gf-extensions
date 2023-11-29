@@ -4,6 +4,7 @@ go 1.18
 
 require (
 	github.com/aliyun/aliyun-oss-go-sdk v2.2.5+incompatible
+	github.com/asaskevich/EventBus v0.0.0-20200907212545-49d423059eef
 	github.com/gogf/gf/v2 v2.0.6
 	github.com/golang-jwt/jwt/v4 v4.3.0
 	github.com/jinzhu/copier v0.3.5
