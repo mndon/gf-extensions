@@ -7,6 +7,7 @@ import (
 
 const (
 	HeaderRemoteIp      = "X-Real-Ip"
+	HeaderXA            = "X-Agent"
 	HeaderUA            = "User-Agent"
 	HeaderAuthorization = "Authorization"
 )
