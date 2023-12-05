@@ -60,7 +60,7 @@ func NewJwt(opt JwtOption) *JwtAuth {
 	}
 
 	j := &JwtAuth{
-		IdentityKey:      sessionx.UserUid,
+		IdentityKey:      sessionx.CtxKeyUserUid,
 		TokenLookup:      "header: Authorization",
 		TokenHeadName:    "Bearer",
 		SigningAlgorithm: "HS256",
