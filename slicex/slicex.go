@@ -21,6 +21,19 @@ func GroupBy[T any, T2 comparable](s []T, field func(t T) T2) map[T2][]T {
 	return m
 }
 
+// GroupByAndFlatten
+// @Description: 数组分组
+// @param s 数组
+// @param field 分组字段
+// @return map[T2][]T
+func GroupByAndFlatten[T any, T2 comparable](s []T, field func(t T) T2) map[T2]T {
+	m := make(map[T2]T)
+	for i, _ := range s {
+		m[field(s[i])] = s[i]
+	}
+	return m
+}
+
 // Filter
 // @Description: 列表过滤
 // @param s 数组
