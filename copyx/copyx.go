@@ -6,9 +6,11 @@ import (
 
 // Copy *struct => *struct or *struct => **struct
 func Copy[T any](fromValue interface{}, toValue T) T {
-	err := gconv.Scan(fromValue, toValue)
-	if err != nil {
-		panic(err)
+	if fromValue != nil {
+		err := gconv.Scan(fromValue, toValue)
+		if err != nil {
+			panic(err)
+		}
 	}
 	return toValue
 }
