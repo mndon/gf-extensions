@@ -21,12 +21,12 @@ func handleResponse(r *ghttp.Request) {
 	}
 
 	var (
-		msg    string
-		remark string
 		ctx    = r.Context()
 		err    = r.GetError()
-		res    = r.GetHandlerResponse()
 		code   = gerror.Code(err)
+		res    = r.GetHandlerResponse()
+		msg    string
+		remark = GetResponseRemark(ctx)
 	)
 
 	if err != nil {
