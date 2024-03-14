@@ -29,8 +29,8 @@ func NewAdapterFileWithCmd() *AdapterFileWithCmd {
 }
 
 // Available checks and returns whether configuration of given `file` is available.
-func (a *AdapterFileWithCmd) Available(ctx context.Context, fileName ...string) bool {
-	return a.adapterFile.Available(ctx, fileName...)
+func (a *AdapterFileWithCmd) Available(ctx context.Context, resource ...string) bool {
+	return a.adapterFile.Available(ctx, resource...)
 }
 
 // Data retrieves and returns all configuration data as map type.

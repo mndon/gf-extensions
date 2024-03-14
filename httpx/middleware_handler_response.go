@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"github.com/gogf/gf/v2/errors/gcode"
 	"github.com/gogf/gf/v2/errors/gerror"
-	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/net/ghttp"
 	"github.com/mndon/gf-extensions/errorx"
 	"net/http"
@@ -64,13 +63,10 @@ func handleResponse(r *ghttp.Request) {
 		code = errorx.CodeOk
 	}
 
-	internalErr := r.Response.WriteJson(HandlerResponse{
+	r.Response.WriteJson(HandlerResponse{
 		Status: code.Code(),
 		Remark: remark,
 		Msg:    msg,
 		Data:   res,
 	})
-	if internalErr != nil {
-		g.Log().Errorf(ctx, `%+v`, internalErr)
-	}
 }
