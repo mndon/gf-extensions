@@ -9,6 +9,7 @@ import (
 	"github.com/gogf/gf/v2/os/glog"
 	"github.com/gogf/gf/v2/os/gtime"
 	"github.com/mndon/gf-extensions/sessionx"
+	"time"
 )
 
 const (
@@ -31,7 +32,7 @@ func MiddlewareLogRequest(r *ghttp.Request) {
 
 	ctx := r.GetCtx()
 	mark := access
-	accessTime := gtime.TimestampMilli() - r.EnterTime
+	accessTime := gtime.Now().Sub(r.EnterTime) / time.Millisecond
 	if accessTime > 700 {
 		mark = slowAccess
 	}
