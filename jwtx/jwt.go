@@ -9,6 +9,7 @@ import (
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/mndon/gf-extensions/errorx"
 	"github.com/mndon/gf-extensions/sessionx"
+	"github.com/mndon/gf-extensions/slicex"
 	"github.com/mndon/gf-extensions/utilx"
 	"net/http"
 	"strings"
@@ -33,7 +34,7 @@ type JwtOption struct {
 	CachePrefix string        //缓存key前缀
 	Cache       *gcache.Cache //缓存
 
-	RefreshTokenCustomerCheck func(ctx context.Context, uid string) error
+	RefreshTokenCustomerCheck func(ctx context.Context, uid string) error // 刷新token用户校验hook
 }
 
 type JwtAuth struct {
@@ -41,6 +42,9 @@ type JwtAuth struct {
 	TokenLookup      string // token装载位置
 	TokenHeadName    string // token头名称
 	SigningAlgorithm string //加密方式
+
+	IgnoreAuthUriMap map[string]string //忽略登录接口map
+	QueryAuthUriMap  map[string]string //query鉴权接口map
 
 	BytesSecretKey []byte
 	jwtOption      JwtOption
@@ -71,7 +75,30 @@ func NewJwt(opt JwtOption) *JwtAuth {
 	return j
 }
 
-// GenerateToken 构建token
+// SetIgnoreAuthURIs
+// @Description: 设置query鉴权uri列表
+// @receiver j
+// @param uris
+func (j *JwtAuth) SetIgnoreAuthURIs(uris []string) {
+	j.IgnoreAuthUriMap = slicex.GroupByAndFlatten(uris, func(item string) string { return item })
+}
+
+// SetQueryAuthURIs
+// @Description: 设置忽略鉴权uri列表
+// @receiver j
+// @param uris
+func (j *JwtAuth) SetQueryAuthURIs(uris []string) {
+	j.QueryAuthUriMap = slicex.GroupByAndFlatten(uris, func(item string) string { return item })
+}
+
+// GenerateToken
+// @Description: 构建token
+// @receiver j
+// @param ctx
+// @param userUid
+// @return token
+// @return expire
+// @return err
 func (j *JwtAuth) GenerateToken(ctx context.Context, userUid string) (token string, expire time.Time, err error) {
 	token, t, err := j.buildJwt(g.Map{j.IdentityKey: userUid})
 	if err != nil {
@@ -144,67 +171,73 @@ func (j *JwtAuth) RefreshToken(ctx context.Context) (string, time.Time, error) {
 	return token, expire, nil
 }
 
-// MiddlewareJwtAuth 生成jwt鉴权中间件
+// MiddlewareJwtAuth
+// @Description: jwt鉴权中间件
+// @receiver j
+// @param r
 func (j *JwtAuth) MiddlewareJwtAuth(r *ghttp.Request) {
 	ctx := r.GetCtx()
 
-	// 获取载荷
-	claims, token, err := j.getClaimsFromJWT(ctx)
-	if err != nil {
-		j.unauthorized(ctx, errorx.NotAuthorizedErr("invalid token, code: 1"))
-		return
-	}
-	// 获取过期时间
-	if claims[Exp] == nil {
-		j.unauthorized(ctx, errorx.NotAuthorizedErr("invalid token, code: 2"))
-		return
-	}
-	if _, ok := claims[Exp].(float64); !ok {
-		j.unauthorized(ctx, errorx.NotAuthorizedErr("invalid token, code: 3"))
-		return
-	}
-	// 校验过期
-	if int64(claims[Exp].(float64)) < time.Now().Unix() {
-		j.unauthorized(ctx, errorx.NotAuthorizedErr("token expire"))
-		return
-	}
-
-	// 校验用户id有效性
-	userUid := gconv.String(claims[j.IdentityKey])
-	if userUid == "" {
-		j.unauthorized(ctx, errorx.NotAuthorizedErr("invalid token, code: 4"))
-		return
-	}
-
-	r.SetParam(PayloadKey, claims)
-	r.SetParam(j.IdentityKey, userUid)
-
-	// 多设备限制登录
-	if j.jwtOption.LimitLogin {
-		userUid := sessionx.GetUserUid(ctx)
-		cacheKey := j.buildCacheKey(userUid)
-		v, err := j.jwtOption.Cache.Get(ctx, cacheKey)
+	_, ok := j.IgnoreAuthUriMap[r.Router.Uri]
+	if !ok {
+		// 获取载荷
+		claims, token, err := j.getClaimsFromJWT(ctx)
 		if err != nil {
-			j.unauthorized(ctx, errorx.NewErrWithCode(errorx.CodeInternalErr, "Login limit cache error, code: 1"))
+			j.unauthorized(ctx, errorx.NotAuthorizedErr("invalid token, code: 1"))
 			return
 		}
-		tokens := v.Strings()
-		// tokens在限制数量内
-		if len(tokens) < j.jwtOption.LimitCount {
-			// token不在缓存中，则新增
-			if !utilx.StringsIn(token, tokens) {
-				tokenExpireTime := time.Unix(int64(claims[Exp].(float64)), 0)
-				err = j.addTokenToCache(ctx, userUid, token, tokenExpireTime)
-				if err != nil {
-					j.unauthorized(ctx, errorx.NewErrWithCode(errorx.CodeInternalErr, "Login limit cache error, code: 2"))
+		// 获取过期时间
+		if claims[Exp] == nil {
+			j.unauthorized(ctx, errorx.NotAuthorizedErr("invalid token, code: 2"))
+			return
+		}
+		if _, ok := claims[Exp].(float64); !ok {
+			j.unauthorized(ctx, errorx.NotAuthorizedErr("invalid token, code: 3"))
+			return
+		}
+		// 校验过期
+		if int64(claims[Exp].(float64)) < time.Now().Unix() {
+			j.unauthorized(ctx, errorx.NotAuthorizedErr("token expire"))
+			return
+		}
+
+		// 校验用户id有效性
+		userUid := gconv.String(claims[j.IdentityKey])
+		if userUid == "" {
+			j.unauthorized(ctx, errorx.NotAuthorizedErr("invalid token, code: 4"))
+			return
+		}
+
+		r.SetParam(PayloadKey, claims)
+		r.SetParam(j.IdentityKey, userUid)
+
+		// 多设备限制登录
+		if j.jwtOption.LimitLogin {
+			userUid := sessionx.GetUserUid(ctx)
+			cacheKey := j.buildCacheKey(userUid)
+			v, err := j.jwtOption.Cache.Get(ctx, cacheKey)
+			if err != nil {
+				j.unauthorized(ctx, errorx.NewErrWithCode(errorx.CodeInternalErr, "Login limit cache error, code: 1"))
+				return
+			}
+			tokens := v.Strings()
+			// tokens在限制数量内
+			if len(tokens) < j.jwtOption.LimitCount {
+				// token不在缓存中，则新增
+				if !utilx.StringsIn(token, tokens) {
+					tokenExpireTime := time.Unix(int64(claims[Exp].(float64)), 0)
+					err = j.addTokenToCache(ctx, userUid, token, tokenExpireTime)
+					if err != nil {
+						j.unauthorized(ctx, errorx.NewErrWithCode(errorx.CodeInternalErr, "Login limit cache error, code: 2"))
+						return
+					}
+				}
+			} else {
+				// tokens到达限制数量内，且token不存在，则推出登陆
+				if !utilx.StringsIn(token, tokens) {
+					j.unauthorized(ctx, errorx.NewErrWithCode(errorx.CodeLoginLimitErr, "login of multiple devices"))
 					return
 				}
-			}
-		} else {
-			// tokens到达限制数量内，且token不存在，则推出登陆
-			if !utilx.StringsIn(token, tokens) {
-				j.unauthorized(ctx, errorx.NewErrWithCode(errorx.CodeLoginLimitErr, "login of multiple devices"))
-				return
 			}
 		}
 	}
@@ -262,7 +295,14 @@ func (j *JwtAuth) parseToken(r *ghttp.Request) (*jwt.Token, error) {
 	var token string
 	var err error
 
-	methods := strings.Split(j.TokenLookup, ",")
+	tokenLookup := j.TokenLookup
+	// 指定从query获取token
+	_, ok := j.QueryAuthUriMap[r.Router.Uri]
+	if ok {
+		tokenLookup = "query: token"
+	}
+
+	methods := strings.Split(tokenLookup, ",")
 	for _, method := range methods {
 		if len(token) > 0 {
 			break
