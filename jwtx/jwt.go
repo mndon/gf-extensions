@@ -245,6 +245,25 @@ func (j *JwtAuth) MiddlewareJwtAuth(r *ghttp.Request) {
 	r.Middleware.Next()
 }
 
+// GetUid
+// @Description: 获取uid
+// @receiver j
+// @param r
+func (j *JwtAuth) GetUid(ctx context.Context) string {
+	r := ghttp.RequestFromCtx(ctx)
+
+	v := r.GetParam(j.IdentityKey)
+	if v != nil {
+		return v.String()
+	}
+
+	claims, _, err := j.getClaimsFromJWT(ctx)
+	if err != nil {
+		return ""
+	}
+	return gconv.String(claims[j.IdentityKey])
+}
+
 // unauthorized
 // @Description: 鉴权失败回调
 // @receiver j
