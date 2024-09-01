@@ -29,9 +29,27 @@ func NewUss(endpoint string, accessKeyId string, accessKeySecret string, bucket 
 	}
 }
 
+// Conn
+// @Description: 获取bucket对象
+// @receiver u
+// @return *oss.Bucket
+// @return error
+func (u *Uss) Conn() (*oss.Bucket, error) {
+	client, err := oss.New(u.endpoint, u.accessKeyId, u.accessKeySecret)
+	if err != nil {
+		return nil, err
+	}
+	// New bucket
+	bucket, err := client.Bucket(u.Bucket)
+	if err != nil {
+		return nil, err
+	}
+	return bucket, nil
+}
+
 // DeleteObj 删除文件
 func (u *Uss) DeleteObj(objName string) error {
-	bucket, err := u.getBucket()
+	bucket, err := u.Conn()
 	if err != nil {
 		return err
 	}
@@ -49,7 +67,7 @@ func (u *Uss) DeleteObj(objName string) error {
 // @return url
 // @return err
 func (u *Uss) SignUrl(objName string) (url string, err error) {
-	bucket, err := u.getBucket()
+	bucket, err := u.Conn()
 	if err != nil {
 		return "", err
 	}
@@ -73,7 +91,7 @@ func (u *Uss) SignUrl(objName string) (url string, err error) {
 // @return exist
 // @return err
 func (u *Uss) IsObjExist(objName string) (exist bool, err error) {
-	bucket, err := u.getBucket()
+	bucket, err := u.Conn()
 	if err != nil {
 		return false, err
 	}
@@ -108,19 +126,6 @@ func (u *Uss) GetObjUrl(objName string, cdn bool) (url string, err error) {
 	return u.BucketUrl + objName, nil
 }
 
-func (u *Uss) getBucket() (*oss.Bucket, error) {
-	client, err := oss.New(u.endpoint, u.accessKeyId, u.accessKeySecret)
-	if err != nil {
-		return nil, err
-	}
-	// New bucket
-	bucket, err := client.Bucket(u.Bucket)
-	if err != nil {
-		return nil, err
-	}
-	return bucket, nil
-}
-
 // GetObjectToFile
 // @Description: 下载文件
 // @receiver u
@@ -128,7 +133,7 @@ func (u *Uss) getBucket() (*oss.Bucket, error) {
 // @param filePath
 // @return err
 func (u *Uss) GetObjectToFile(objName string, filePath string) (err error) {
-	bucket, err := u.getBucket()
+	bucket, err := u.Conn()
 	if err != nil {
 		return err
 	}
@@ -148,7 +153,7 @@ func (u *Uss) GetObjectToFile(objName string, filePath string) (err error) {
 }
 
 func (u *Uss) GetObjectMd5(objName string) (md5 string, err error) {
-	bucket, err := u.getBucket()
+	bucket, err := u.Conn()
 	if err != nil {
 		return "", err
 	}
