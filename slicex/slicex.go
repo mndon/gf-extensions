@@ -164,6 +164,20 @@ func Every[T any](s []T, test func(item T) bool) bool {
 	return true
 }
 
+// Any
+// @Description: 只要有1个满足
+// @param s
+// @param test
+// @return bool
+func Any[T any](s []T, test func(item T) bool) bool {
+	for i := range s {
+		if test(s[i]) {
+			return true
+		}
+	}
+	return false
+}
+
 // Union
 // @Description: 合并输入数据，并去重
 // @param s
