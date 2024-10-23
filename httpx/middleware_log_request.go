@@ -37,9 +37,14 @@ func MiddlewareLogRequest(r *ghttp.Request) {
 		mark = slowAccess
 	}
 
+	bodyString := r.GetBodyString()
+	if len(bodyString) > 512 {
+		bodyString = bodyString[:512] + "..."
+	}
+
 	content := fmt.Sprintf(
 		`[%d ms] [%s] %d "%s %s %s", "%s", "%s", "%s", "%s", "%s"`,
-		accessTime, mark, r.Response.Status, r.Method, r.Router.Uri, r.URL.String(), r.GetBodyString(),
+		accessTime, mark, r.Response.Status, r.Method, r.Router.Uri, r.URL.String(), bodyString,
 		GetRemoteIpFromCtx(ctx), sessionx.GetUserUid(ctx), GetAgent(ctx).agent, r.Header.Get(HeaderAuthorization),
 	)
 
