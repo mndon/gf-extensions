@@ -45,7 +45,7 @@ func MiddlewareLogRequest(r *ghttp.Request) {
 	content := fmt.Sprintf(
 		`[%d ms] [%s] %d "%s %s %s", "%s", "%s", "%s", "%s", "%s"`,
 		accessTime, mark, r.Response.Status, r.Method, r.Router.Uri, r.URL.String(), bodyString,
-		GetRemoteIpFromCtx(ctx), sessionx.GetUserUid(ctx), GetAgent(ctx).agent, r.Header.Get(HeaderAuthorization),
+		GetRemoteIpFromCtx(ctx), sessionx.GetUserUid(ctx), AgentStrFromHeader(ctx), r.Header.Get(HeaderAuthorization),
 	)
 
 	err := r.GetError()

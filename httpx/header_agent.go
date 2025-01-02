@@ -3,15 +3,32 @@ package httpx
 import (
 	"context"
 	"github.com/gogf/gf/v2/net/ghttp"
+	"github.com/gogf/gf/v2/os/gctx"
 	"regexp"
 	"strings"
 )
 
+const ctxKeyForAgent = "httpxAgent"
+
 type Agent struct {
 	agent string
+
+	channel    string // 渠道
+	platform   string // 平台
+	appVersion string // app版本
+	brand      string // 设备厂商
+	model      string // 设备型号
+	passport   string // 设备id
 }
 
-func GetAgent(ctx context.Context) (agent Agent) {
+func AgentFromCtx(ctx context.Context) (agent *Agent) {
+	gctx.New()
+	v := ctx.Value(ctxKeyForAgent)
+	if v != nil {
+		return v.(*Agent)
+	}
+
+	agent = &Agent{}
 	r := ghttp.RequestFromCtx(ctx)
 	if r == nil {
 		return
@@ -21,36 +38,90 @@ func GetAgent(ctx context.Context) (agent Agent) {
 	} else {
 		agent.agent = r.Header.Get(HeaderUA)
 	}
-	return
+	return agent
+}
+
+func AgentStrFromHeader(ctx context.Context) (agent string) {
+	r := ghttp.RequestFromCtx(ctx)
+	if r == nil {
+		return
+	}
+	if r.Header.Get(HeaderXA) != "" {
+		return r.Header.Get(HeaderXA)
+	}
+	return r.Header.Get(HeaderUA)
+}
+
+func WithAgent(ctx context.Context, agent *Agent) context.Context {
+	return context.WithValue(ctx, ctxKeyForAgent, agent)
 }
 
 func (a *Agent) GetAgent() string {
 	return a.agent
 }
 
+func (a *Agent) SetChannel(v string) {
+	a.channel = strings.ToUpper(v)
+}
+
 func (a *Agent) GetChannel() string {
-	return a.GetValueFormUA(`Channel\((.*?)\)`)
+	a.channel = a.GetValueFormUA(`Channel\((.*?)\)`)
+	return a.channel
+}
+
+func (a *Agent) SetPlatform(v string) {
+	a.platform = strings.ToUpper(v)
 }
 
 func (a *Agent) GetPlatform() string {
-	// 兼容早期字段单词错误Platfom
-	return a.GetValueFormUA(`Platfo.?m\((.*?)\)`)
+	if a.platform == "" {
+		a.platform = a.GetValueFormUA(`Platfo.?m\((.*?)\)`)
+	}
+	return a.platform
+}
+
+func (a *Agent) SetAppVersion(v string) {
+	a.appVersion = strings.ToUpper(v)
 }
 
 func (a *Agent) GetAppVersion() string {
-	return a.GetValueFormUA(`App Version\((.*?)\)`)
+	if a.appVersion == "" {
+		a.appVersion = a.GetValueFormUA(`App Version\((.*?)\)`)
+	}
+	return a.appVersion
+}
+
+func (a *Agent) SetBrand(v string) {
+	a.brand = strings.ToUpper(v)
 }
 
 func (a *Agent) GetBrand() string {
-	return a.GetValueFormUA(`Brand\((.*?)\)`)
+	if a.brand == "" {
+		a.brand = a.GetValueFormUA(`Brand\((.*?)\)`)
+	}
+	return a.brand
+}
+
+func (a *Agent) SetModel(v string) {
+	a.model = strings.ToUpper(v)
 }
 
 func (a *Agent) GetModel() string {
-	return a.GetValueFormUA(`Model\((.*?)\)`)
+	if a.model == "" {
+		a.model = a.GetValueFormUA(`Model\((.*?)\)`)
+	}
+	return a.model
+}
+
+func (a *Agent) SetPassport(v string) {
+	a.passport = strings.ToUpper(v)
 }
 
 func (a *Agent) GetPassport() string {
-	return a.GetValueFormUA(`Passport\((.*?)\)`)
+	if a.passport == "" {
+		a.passport = a.GetValueFormUA(`Passport\((.*?)\)`)
+	}
+	return a.passport
 }
 
 func (a *Agent) GetValueFormUA(matchKey string) string {
