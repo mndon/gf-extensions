@@ -3,7 +3,6 @@ package httpx
 import (
 	"context"
 	"github.com/gogf/gf/v2/net/ghttp"
-	"github.com/gogf/gf/v2/os/gctx"
 	"regexp"
 	"strings"
 )
@@ -22,7 +21,6 @@ type Agent struct {
 }
 
 func AgentFromCtx(ctx context.Context) (agent *Agent) {
-	gctx.New()
 	v := ctx.Value(ctxKeyForAgent)
 	if v != nil {
 		return v.(*Agent)
