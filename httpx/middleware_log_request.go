@@ -1,13 +1,13 @@
 package httpx
 
 import (
-	"fmt"
 	"github.com/gogf/gf/v2/errors/gcode"
 	"github.com/gogf/gf/v2/errors/gerror"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/net/ghttp"
 	"github.com/gogf/gf/v2/os/glog"
 	"github.com/gogf/gf/v2/os/gtime"
+	"github.com/mndon/gf-extensions/logx"
 	"github.com/mndon/gf-extensions/sessionx"
 	"time"
 )
@@ -42,15 +42,15 @@ func MiddlewareLogRequest(r *ghttp.Request) {
 		bodyString = bodyString[:512] + "..."
 	}
 
-	content := fmt.Sprintf(
-		`[%d ms] [%s] %d "%s %s %s", "%s", "%s", "%s", "%s", "%s"`,
-		accessTime, mark, r.Response.Status, r.Method, r.Router.Uri, r.URL.String(), bodyString,
-		GetRemoteIpFromCtx(ctx), sessionx.GetUserUid(ctx), AgentStrFromHeader(ctx), r.Header.Get(HeaderAuthorization),
-	)
+	logger := logx.New().AccessTime(accessTime).Type(mark).
+		ResStatus(r.Response.Status).
+		ReqMethod(r.Method).ReqUri(r.Router.Uri).ReqUrl(r.URL.String()).ReqBody(bodyString).
+		Uid(sessionx.GetUserUid(ctx)).ReqIp(GetRemoteIpFromCtx(ctx)).UA(AgentStrFromHeader(ctx))
 
+	var content string
 	err := r.GetError()
 	if err != nil {
-		content += fmt.Sprintf(`, "%s"`, r.Response.BufferString())
+		content += r.Response.BufferString()
 		if stack := gerror.Stack(err); stack != "" {
 			content += "\nStack:\n" + stack
 		} else {
@@ -59,11 +59,11 @@ func MiddlewareLogRequest(r *ghttp.Request) {
 
 		code := gerror.Code(err)
 		if code != gcode.CodeNil {
-			accessLogger.Warning(ctx, content)
+			logger.Warning(ctx, content)
 		} else {
-			accessLogger.Error(ctx, content)
+			logger.Error(ctx, content)
 		}
 	} else {
-		accessLogger.Info(ctx, content)
+		logger.Info(ctx, content)
 	}
 }
