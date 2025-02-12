@@ -1,34 +1,51 @@
 package logx
 
 import (
+	"context"
 	"github.com/gogf/gf/v2/frame/g"
-	"github.com/gogf/gf/v2/os/glog"
-	"time"
 )
 
-const CustomFieldsKey = "logCK"
+const (
+	HandleTypePlain = "plain"
+	HandleTypeJSON  = "json"
+)
 
-type customFields struct {
-	Type       string        `json:",omitempty"` // 日志类型 ACCESS / SLOW_ACCESS / 其他
-	AccessTime time.Duration `json:",omitempty"` // 处理时长
-	ReqStatus  int           `json:",omitempty"` // 响应http状态码
-	ReqMethod  string        `json:",omitempty"` // 请求方法
-	ReqUri     string        `json:",omitempty"` // 请求uri
-	ReqUrl     string        `json:",omitempty"` // 请求url
-	ReqBody    string        `json:",omitempty"` // 请求body
-	ReqIp      string        `json:",omitempty"` // 请求ip
-	UA         string        `json:",omitempty"` // 请求agent
-	Uid        string        `json:",omitempty"` // 请求uid
-}
+// init
+// @Description: logx初始化
+//  1. 配置输出格式，配置项：
+//     logger.logxHandle：handle名称，plain-可视化文本 json-json格式
+//  2. 配置日志滚动删除，配置项：
+//     logger.logxRotateEnable：是否开启日志滚动删除
+//     logger.path：日志路径
+//     logger.logxRotateCountLimit：保留几份日志
+//     logger.logxRotateCheckInterval： 滚动脚本运行频率
+func init() {
+	ctx := context.Background()
 
-type Logger struct {
-	*glog.Logger // Parent logger, if it is not empty, it means the logger is used in chaining function.
-	customFields customFields
-}
+	handleType, _ := g.Cfg().Get(ctx, "logger.logxHandle", "text")
+	switch handleType.String() {
+	case HandleTypePlain:
+		g.Log().SetHandlers(HandlerLocal)
+	case HandleTypeJSON:
+		g.Log().SetHandlers(HandlerJson)
+	default:
+		g.Log().SetHandlers(HandlerLocal)
+	}
 
-func New(name ...string) *Logger {
-	return &Logger{
-		Logger:       g.Log(name...),
-		customFields: customFields{},
+	// 日志滚动
+	if g.Cfg().MustGet(ctx, "logger.logxRotateEnable", false).Bool() {
+		NewRotate(
+			g.Cfg().MustGet(ctx, "logger.path").String(),
+			g.Cfg().MustGet(ctx, "logger.logxRotateCountLimit").Int(),
+			g.Cfg().MustGet(ctx, "logger.logxRotateCheckInterval").String(),
+		).RotateChecksTimely(ctx)
+	}
+
+	if g.Cfg().MustGet(ctx, "database.logger.logxRotateEnable", false).Bool() {
+		NewRotate(
+			g.Cfg().MustGet(ctx, "database.logger.path").String(),
+			g.Cfg().MustGet(ctx, "database.logger.logxRotateCountLimit").Int(),
+			g.Cfg().MustGet(ctx, "database.logger.logxRotateCheckInterval").String(),
+		).RotateChecksTimely(ctx)
 	}
 }
