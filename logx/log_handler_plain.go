@@ -7,12 +7,12 @@ import (
 	"github.com/gogf/gf/v2/util/gconv"
 )
 
-func HandlerLocal(ctx context.Context, in *glog.HandlerInput) {
-	in.Buffer = formatLocalOutput(ctx, *in)
+func HandlerPlain(ctx context.Context, in *glog.HandlerInput) {
+	in.Buffer = formatPlainOutput(ctx, *in)
 	in.Next(ctx)
 }
 
-func formatLocalOutput(ctx context.Context, in glog.HandlerInput) *bytes.Buffer {
+func formatPlainOutput(ctx context.Context, in glog.HandlerInput) *bytes.Buffer {
 	buffer := bytes.NewBuffer(nil)
 	if in.Logger.GetConfig().HeaderPrint {
 		if in.TimeFormat != "" {
@@ -28,7 +28,7 @@ func formatLocalOutput(ctx context.Context, in glog.HandlerInput) *bytes.Buffer 
 	}
 
 	// 自定义字段处理
-	v, ok := ctx.Value(CustomFieldsKey).(customFields)
+	v, ok := ctx.Value(CustomFieldsKey).(*CustomFields)
 	if ok {
 		addStringToBuffer(buffer, gconv.String(v))
 	}

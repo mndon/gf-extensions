@@ -8,6 +8,7 @@ import (
 	"github.com/gogf/gf/v2/util/gconv"
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/mndon/gf-extensions/errorx"
+	"github.com/mndon/gf-extensions/logx"
 	"github.com/mndon/gf-extensions/sessionx"
 	"github.com/mndon/gf-extensions/slicex"
 	"github.com/mndon/gf-extensions/utilx"
@@ -210,6 +211,8 @@ func (j *JwtAuth) MiddlewareJwtAuth(r *ghttp.Request) {
 
 		r.SetParam(PayloadKey, claims)
 		r.SetParam(j.IdentityKey, userUid)
+		// 将uid写入日志上下文
+		r.SetCtx(logx.WithCustomFields(ctx, logx.CustomFields{Uid: userUid}))
 
 		// 多设备限制登录
 		if j.jwtOption.LimitLogin {

@@ -16,9 +16,11 @@ type HandlerOutputJson struct {
 	CallerPath string `json:",omitempty"` // The source file path and its line number that calls logging, only available if F_FILE_SHORT or F_FILE_LONG set.
 	CallerFunc string `json:",omitempty"` // The source function name that calls logging, only available if F_CALLER_FN set.
 	Prefix     string `json:",omitempty"` // Custom prefix string for logging content.
-	Content    string `json:""`           // Content is the main logging content, containing error stack string produced by logger.
-	Stack      string `json:",omitempty"` // Stack string produced by logger, only available if Config.StStatus configured.
-	customFields
+
+	CustomFields
+
+	Content string `json:""`           // Content is the main logging content, containing error stack string produced by logger.
+	Stack   string `json:",omitempty"` // Stack string produced by logger, only available if Config.StStatus configured.
 }
 
 // HandlerJson is a handler for output logging content as a single json string.
@@ -36,9 +38,9 @@ func HandlerJson(ctx context.Context, in *glog.HandlerInput) {
 	}
 
 	// 自定义字段处理
-	v, ok := ctx.Value(CustomFieldsKey).(customFields)
+	v, ok := ctx.Value(CustomFieldsKey).(*CustomFields)
 	if ok {
-		output.customFields = v
+		output.CustomFields = *v
 	}
 
 	// Convert values string content.

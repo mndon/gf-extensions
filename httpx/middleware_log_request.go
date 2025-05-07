@@ -28,13 +28,24 @@ func init() {
 
 // MiddlewareLogRequest 验证请求签名
 func MiddlewareLogRequest(r *ghttp.Request) {
+	ctx := r.GetCtx()
+
+	ctx = logx.WithCustomFields(ctx, logx.CustomFields{
+		Uid:       sessionx.GetUserUid(ctx),
+		ReqMethod: r.Method,
+		ReqUri:    r.Router.Uri,
+		ReqUrl:    r.URL.String(),
+	})
+	r.SetCtx(ctx)
+
 	r.Middleware.Next()
 
-	ctx := r.GetCtx()
-	mark := access
+	ctx = r.GetCtx()
+
+	typ := access
 	accessTime := gtime.Now().Sub(r.EnterTime) / time.Millisecond
 	if accessTime > 700 {
-		mark = slowAccess
+		typ = slowAccess
 	}
 
 	bodyString := r.GetBodyString()
@@ -42,10 +53,8 @@ func MiddlewareLogRequest(r *ghttp.Request) {
 		bodyString = bodyString[:512] + "..."
 	}
 
-	logger := logx.New().AccessTime(accessTime).Type(mark).
-		ResStatus(r.Response.Status).
-		ReqMethod(r.Method).ReqUri(r.Router.Uri).ReqUrl(r.URL.String()).ReqBody(bodyString).
-		Uid(sessionx.GetUserUid(ctx)).ReqIp(GetRemoteIpFromCtx(ctx)).UA(AgentStrFromHeader(ctx))
+	logger := logx.New(ctx).AccessTime(accessTime).Type(typ).
+		ResStatus(r.Response.Status).ReqBody(bodyString).ReqIp(GetRemoteIpFromCtx(ctx)).UA(AgentStrFromHeader(ctx))
 
 	var content string
 	err := r.GetError()
@@ -59,11 +68,11 @@ func MiddlewareLogRequest(r *ghttp.Request) {
 
 		code := gerror.Code(err)
 		if code != gcode.CodeNil {
-			logger.Warning(ctx, content)
+			logger.Warning(content)
 		} else {
-			logger.Error(ctx, content)
+			logger.Error(content)
 		}
 	} else {
-		logger.Info(ctx, content)
+		logger.Info(content)
 	}
 }
