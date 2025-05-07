@@ -5,6 +5,7 @@ import (
 	"github.com/gogf/gf/v2/errors/gcode"
 	"github.com/gogf/gf/v2/errors/gerror"
 	"github.com/gogf/gf/v2/net/ghttp"
+	"github.com/gogf/gf/v2/os/gctx"
 	"github.com/mndon/gf-extensions/errorx"
 	"net/http"
 )
@@ -42,10 +43,16 @@ func handleResponse(r *ghttp.Request) {
 		case gcode.CodeValidationFailed: // 参数校验失败
 			code = errorx.CodeBadRequestErr
 			remark = err.Error()
+		case gcode.CodeDbOperationError:
+			code = errorx.CodeInternalErr
+			remark = "db异常，请联系客服解决"
+			msg = "db异常，请联系客服解决"
 		default:
 			remark = code.Message()
 		}
-		msg = err.Error()
+		if msg == "" {
+			msg = err.Error()
+		}
 	} else if r.Response.Status > 0 && r.Response.Status != http.StatusOK {
 		// 捕获http错误响应码， 映射成自定义错误类型
 		msg = http.StatusText(r.Response.Status)
@@ -62,11 +69,11 @@ func handleResponse(r *ghttp.Request) {
 	} else {
 		code = errorx.CodeOk
 	}
-
 	r.Response.WriteJson(HandlerResponse{
-		Status: code.Code(),
-		Remark: remark,
-		Msg:    msg,
-		Data:   res,
+		Status:  code.Code(),
+		Remark:  remark,
+		Msg:     msg,
+		TraceId: gctx.CtxId(ctx),
+		Data:    res,
 	})
 }
