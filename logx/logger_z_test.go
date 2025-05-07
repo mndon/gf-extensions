@@ -16,10 +16,11 @@ func TestUse(t *testing.T) {
 func TestName(t *testing.T) {
 	ctx := gctx.New()
 
-	g.Log().SetHandlers(HandlerLocal)
+	g.Log().SetHandlers(HandlerPlain)
 	//g.Log().SetHandlers(HandlerJson)z
+	ctx = WithCustomFields(ctx, CustomFields{Uid: "10086"})
 	err := gerror.New("fdsafsdf")
-	New().Type("111").Errorf(ctx, "%+v", err)
-	New().Type("111").Infof(ctx, "%+v", err)
-	New().Type("111").Infof(ctx, "ccccc")
+	New(ctx).Type("typ1").Errorf("%+v", err)
+	New(ctx).Type("typ2").Infof("%+v", err)
+	New(ctx).Type("typ3").Infof("ccccc")
 }

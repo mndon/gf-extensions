@@ -19,20 +19,6 @@ func ExtBootUp(ctx context.Context, s *ghttp.Server) {
 		s.EnablePProf()
 	}
 
-	// 2. 日志滚动
-	if g.Cfg().MustGet(ctx, "logger.logxRotateEnable").Bool() {
-		logx.NewRotate(
-			g.Cfg().MustGet(ctx, "logger.path").String(),
-			g.Cfg().MustGet(ctx, "logger.logxRotateCountLimit").Int(),
-			g.Cfg().MustGet(ctx, "logger.logxRotateCheckInterval").String(),
-		).RotateChecksTimely(ctx)
-	}
-
-	if g.Cfg().MustGet(ctx, "database.logger.logxRotateEnable").Bool() {
-		logx.NewRotate(
-			g.Cfg().MustGet(ctx, "database.logger.path").String(),
-			g.Cfg().MustGet(ctx, "database.logger.logxRotateCountLimit").Int(),
-			g.Cfg().MustGet(ctx, "database.logger.logxRotateCheckInterval").String(),
-		).RotateChecksTimely(ctx)
-	}
+	// 2. 日志配置
+	logx.Init(ctx)
 }
