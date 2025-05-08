@@ -10,9 +10,9 @@ import (
 // HandlerOutputJson is the structure outputting logging content as single json.
 type HandlerOutputJson struct {
 	Time       string `json:""`           // Formatted time string, like "2016-01-09 12:00:00".
+	Level      string `json:""`           // Formatted level string, like "DEBU", "ERRO", etc. Eg: ERRO
 	TraceId    string `json:",omitempty"` // Trace id, only available if tracing is enabled.
 	CtxStr     string `json:",omitempty"` // The retrieved context value string from context, only available if Config.CtxKeys configured.
-	Level      string `json:""`           // Formatted level string, like "DEBU", "ERRO", etc. Eg: ERRO
 	CallerPath string `json:",omitempty"` // The source file path and its line number that calls logging, only available if F_FILE_SHORT or F_FILE_LONG set.
 	CallerFunc string `json:",omitempty"` // The source function name that calls logging, only available if F_CALLER_FN set.
 	Prefix     string `json:",omitempty"` // Custom prefix string for logging content.
