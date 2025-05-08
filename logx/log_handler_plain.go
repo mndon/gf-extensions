@@ -20,6 +20,9 @@ func formatPlainOutput(ctx context.Context, in glog.HandlerInput) *bytes.Buffer 
 		}
 		if in.Logger.GetConfig().LevelPrint && in.LevelFormat != "" {
 			var levelStr = "[" + in.LevelFormat + "]"
+			if in.Color > 0 {
+				levelStr = getColoredStr(getColorByLevel(in.Level), levelStr)
+			}
 			addStringToBuffer(buffer, levelStr)
 		}
 	}
