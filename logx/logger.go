@@ -4,7 +4,7 @@ import (
 	"context"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/os/glog"
-	"github.com/jinzhu/copier"
+	"github.com/gogf/gf/v2/util/gconv"
 	"time"
 )
 
@@ -52,7 +52,10 @@ func WithCustomFields(ctx context.Context, fields CustomFields) context.Context 
 	v, ok := ctx.Value(CustomFieldsKey).(*CustomFields)
 	if !ok {
 		v = &CustomFields{}
+		_ = gconv.Scan(gconv.String(fields), &v)
+		return context.WithValue(ctx, CustomFieldsKey, v)
+	} else {
+		_ = gconv.Scan(gconv.String(fields), &v)
+		return ctx
 	}
-	_ = copier.Copy(&v, fields)
-	return context.WithValue(ctx, CustomFieldsKey, v)
 }
