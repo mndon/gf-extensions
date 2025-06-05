@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/gogf/gf/v2/os/gcfg"
 	"github.com/gogf/gf/v2/os/gcmd"
+	"github.com/mndon/gf-extensions/envx"
 )
 
 type AdapterFileWithCmd struct {
@@ -18,6 +19,20 @@ func NewAdapterFileWithCmd() *AdapterFileWithCmd {
 	if err != nil {
 		panic("config error")
 	}
+	env := envx.GetEnv()
+	switch env {
+	case envx.EnvProd:
+		adapter.SetFileName("prod.yaml")
+	case envx.EnvStaging:
+		adapter.SetFileName("staging.yaml")
+	case envx.EnvTest:
+		adapter.SetFileName("test.yaml")
+	case envx.EnvLocal:
+		adapter.SetFileName("local.yaml")
+	default:
+		adapter.SetFileName("local.yaml")
+	}
+
 	config := &AdapterFileWithCmd{}
 	config.adapterFile = adapter
 	data, err := config.Data(context.TODO())

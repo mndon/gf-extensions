@@ -4,8 +4,8 @@ import (
 	"github.com/yitter/idgenerator-go/idgen"
 )
 
-// InitUid 单例初始化
-func InitUid(workId uint16) {
+// Init 单例初始化
+func Init(workId uint16) {
 	idgen.SetIdGenerator(idgen.NewIdGeneratorOptions(workId))
 }
 

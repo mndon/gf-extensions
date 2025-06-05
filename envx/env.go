@@ -1,8 +1,9 @@
 package envx
 
 import (
-	"context"
-	"github.com/gogf/gf/v2/frame/g"
+	"fmt"
+	"github.com/gogf/gf/v2/os/gcmd"
+	"github.com/gogf/gf/v2/os/genv"
 	"strings"
 	"sync"
 )
@@ -19,12 +20,16 @@ const (
 
 func GetEnv() string {
 	initEnv.Do(func() {
-		env := g.Cfg().MustGet(context.TODO(), "MY_ENV", EnvLocal).String()
+		env := gcmd.GetOpt("MY_ENV", "").String()
+		if env == "" {
+			env = genv.Get("MY_ENV", EnvLocal).String()
+		}
 		env = strings.ToLower(env)
 		if env != EnvLocal && env != EnvTest && env != EnvStaging && env != EnvProd {
 			env = EnvLocal
 		}
 		Env = env
+		fmt.Println("MY_ENV:", Env)
 	})
 	return Env
 }
