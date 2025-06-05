@@ -5,10 +5,22 @@ import (
 	"context"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/net/ghttp"
+	"github.com/mndon/gf-extensions/configx"
 	"github.com/mndon/gf-extensions/logx"
 )
 
-func ExtBootUp(ctx context.Context, s *ghttp.Server) {
+func init() {
+	// 1. 配置初始化
+	configx.Init()
+
+	// 2. 日志配置
+	logx.Init(context.Background())
+
+	// 3. 雪花发号器初始化
+
+}
+
+func HttpServerBootUp(ctx context.Context, s *ghttp.Server) {
 	// 1. pprof性能分析, 参考：https://goframe.org/docs/web/senior-pprof, 默认会自动注册以下几个路由规则：
 	// /debug/pprof/*action
 	// /debug/pprof/cmdline
@@ -19,6 +31,4 @@ func ExtBootUp(ctx context.Context, s *ghttp.Server) {
 		s.EnablePProf()
 	}
 
-	// 2. 日志配置
-	logx.Init(ctx)
 }
