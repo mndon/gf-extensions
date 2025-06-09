@@ -22,15 +22,15 @@ func NewAdapterFileWithCmd() *AdapterFileWithCmd {
 	env := envx.GetEnv()
 	switch env {
 	case envx.EnvProd:
-		adapter.SetFileName("prod.yaml")
+		adapter.SetFileName("config_prod.yaml")
 	case envx.EnvStaging:
-		adapter.SetFileName("staging.yaml")
+		adapter.SetFileName("config_staging.yaml")
 	case envx.EnvTest:
-		adapter.SetFileName("test.yaml")
+		adapter.SetFileName("config_test.yaml")
 	case envx.EnvLocal:
-		adapter.SetFileName("local.yaml")
+		adapter.SetFileName("config.yaml")
 	default:
-		adapter.SetFileName("local.yaml")
+		adapter.SetFileName("config.yaml")
 	}
 
 	config := &AdapterFileWithCmd{}

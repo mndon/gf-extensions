@@ -21,6 +21,10 @@ func init() {
 	uidx.Init(0)
 }
 
+// HttpServerBootUp
+// @Description: 初始化http服务
+// @param ctx
+// @param s
 func HttpServerBootUp(ctx context.Context, s *ghttp.Server) {
 	// 1. pprof性能分析, 参考：https://goframe.org/docs/web/senior-pprof, 默认会自动注册以下几个路由规则：
 	// /debug/pprof/*action
@@ -32,4 +36,11 @@ func HttpServerBootUp(ctx context.Context, s *ghttp.Server) {
 		s.EnablePProf()
 	}
 
+}
+
+// TestBootUp
+// @Description: 初始化单元测试
+// @param ctx
+func TestBootUp(ctx context.Context) {
+	// 当前未有需要初始化的逻辑， 但是还是需要引入，从而达到执行初始化函数init的目的
 }
