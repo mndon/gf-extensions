@@ -30,16 +30,19 @@ type Logger struct {
 }
 
 func New(ctx context.Context, name ...string) *Logger {
+	cf := CustomFields{}
+
 	v, ok := ctx.Value(CustomFieldsKey).(*CustomFields)
-	if !ok {
-		v = &CustomFields{}
-		ctx = context.WithValue(ctx, CustomFieldsKey, v)
+	if ok {
+		cf = *v
 	}
+	// new的使用重新写上下文，保证本实例的链式修改不影响其他实例
+	ctx = context.WithValue(ctx, CustomFieldsKey, &cf)
 
 	return &Logger{
 		Logger:       g.Log(name...),
 		Ctx:          ctx,
-		customFields: v,
+		customFields: &cf,
 	}
 }
 

@@ -1,7 +1,6 @@
 package logx
 
 import (
-	"github.com/gogf/gf/v2/errors/gerror"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/os/gctx"
 	"testing"
@@ -13,14 +12,16 @@ func TestUse(t *testing.T) {
 
 }
 
-func TestName(t *testing.T) {
+func TestWithCustomFields(t *testing.T) {
+	g.Log().SetHandlers(HandlerJson)
 	ctx := gctx.New()
 
-	g.Log().SetHandlers(HandlerPlain)
-	//g.Log().SetHandlers(HandlerJson)z
-	ctx = WithCustomFields(ctx, CustomFields{Uid: "10086"})
-	err := gerror.New("fdsafsdf")
-	New(ctx).Type("typ1").Errorf("%+v", err)
-	New(ctx).Type("typ2").Infof("%+v", err)
-	New(ctx).Type("typ3").Infof("ccccc")
+	ctx = WithCustomFields(ctx, CustomFields{
+		Uid: "uid",
+	})
+
+	New(ctx).Type("ACCESS").Info("x0")
+
+	g.Log().Info(ctx, "x1") // 输出无type=ACCESS
+	New(ctx).Info("x2")     // 输出无type=ACCESS
 }

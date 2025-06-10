@@ -34,7 +34,6 @@ func MiddlewareLogRequest(r *ghttp.Request) {
 		Uid:       sessionx.GetUserUid(ctx),
 		ReqMethod: r.Method,
 		ReqUri:    r.Router.Uri,
-		ReqUrl:    r.URL.String(),
 	})
 	r.SetCtx(ctx)
 
@@ -53,7 +52,7 @@ func MiddlewareLogRequest(r *ghttp.Request) {
 		bodyString = bodyString[:512] + "..."
 	}
 
-	logger := logx.New(ctx).AccessTime(accessTime).Type(typ).
+	logger := logx.New(ctx).AccessTime(accessTime).Type(typ).ReqUrl(r.URL.String()).
 		ResStatus(r.Response.Status).ReqBody(bodyString).ReqIp(GetRemoteIpFromCtx(ctx)).UA(AgentStrFromHeader(ctx))
 
 	var content string
