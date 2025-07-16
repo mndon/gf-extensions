@@ -20,12 +20,12 @@ func RouterRegister(ctx context.Context, group *ghttp.RouterGroup) {
 		group.Bind(
 			controller.Login,
 		)
-		//登录验证拦截
-		MiddlewareAdminAuth(group)
-		//context拦截器
-		group.Middleware(service.Middleware().Ctx, service.Middleware().Auth)
+
+		//登陆鉴权、用户信息注入、访问权限鉴权
+		group.Middleware(MiddlewareLoginAuth, MiddlewareCtx, MiddlewarePermissionAuth)
 		//后台操作日志记录
 		group.Hook("/*", ghttp.HookAfterOutput, service.OperateLog().OperationLog)
+		// 绑定控制器
 		group.Bind(
 			controller.User,
 			controller.Menu,
