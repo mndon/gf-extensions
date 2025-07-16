@@ -407,7 +407,7 @@ func (j *JwtAuth) signedString(token *jwt.Token) (string, error) {
 }
 
 func (j *JwtAuth) buildCacheKey(key string) string {
-	return "JWT." + j.jwtOption.CachePrefix + "." + key
+	return "JWT:" + j.jwtOption.CachePrefix + ":" + key
 }
 
 func (j *JwtAuth) addTokenToCache(ctx context.Context, userUid string, token string, expireTime time.Time) error {
