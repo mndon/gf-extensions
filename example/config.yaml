@@ -1,0 +1,11 @@
+# config文件仅在 gf脚手架使用
+gfcli:
+  gen:
+    dao:
+      - link: "mysql:***:***@tcp(***:***)/rds_tik?loc=Local&charset=utf8mb4"
+        tables: "kv_config"
+        removePrefix: ""
+        jsonCase: "Snake"
+        daoPath: "../../kvconfigx/internal/dao"
+        doPath: "../../kvconfigx/internal/model/do"
+        entityPath: "../../kvconfigx/internal/model/entity"
