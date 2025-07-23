@@ -20,6 +20,7 @@ import (
 	"github.com/gogf/gf/v2/util/grand"
 	"github.com/mndon/gf-extensions/adminx/internal/api"
 	"github.com/mndon/gf-extensions/adminx/internal/dao"
+	"github.com/mndon/gf-extensions/adminx/internal/lib/libIam"
 	"github.com/mndon/gf-extensions/adminx/internal/lib/libUtils"
 	"github.com/mndon/gf-extensions/adminx/internal/lib/liberr"
 	"github.com/mndon/gf-extensions/adminx/internal/model"
@@ -61,7 +62,8 @@ func (s *sAdminUser) GetAdminUserByUsernamePassword(ctx context.Context, req *ap
 		liberr.ErrIsNil(ctx, err)
 		liberr.ValueIsNil(user, "账号密码错误")
 		//验证密码
-		if libUtils.EncryptPassword(req.Password, user.UserSalt) != user.UserPassword {
+		err = libIam.ValidUserPassword(ctx, req.Username, req.Password)
+		if err != nil {
 			liberr.ErrIsNil(ctx, gerror.New("账号密码错误"))
 		}
 		//账号状态
