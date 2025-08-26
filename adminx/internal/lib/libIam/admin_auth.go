@@ -14,8 +14,8 @@ func init() {
 }
 
 type ValidUserPasswordReq struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
+	Username string `json:"username" form:"username"`
+	Password string `json:"password" form:"password"`
 }
 
 type ValidUserPasswordRes struct {
@@ -32,7 +32,7 @@ type ValidUserPasswordRes struct {
 // @return err
 func ValidUserPassword(ctx context.Context, username, password string) (err error) {
 	res := ValidUserPasswordRes{}
-	r := g.Client().ContentJson().PostVar(ctx, authURL, ValidUserPasswordReq{
+	r := g.Client().PostVar(ctx, authURL, ValidUserPasswordReq{
 		Username: username,
 		Password: password,
 	})

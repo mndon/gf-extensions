@@ -60,7 +60,6 @@ func (s *sAdminUser) GetAdminUserByUsernamePassword(ctx context.Context, req *ap
 	err = g.Try(ctx, func(ctx context.Context) {
 		user, err = s.GetUserByUsername(ctx, req.Username)
 		liberr.ErrIsNil(ctx, err)
-		liberr.ValueIsNil(user, "账号密码错误")
 		//验证密码
 		err = libIam.ValidUserPassword(ctx, req.Username, req.Password)
 		if err != nil {

@@ -12,7 +12,6 @@ import (
 	"github.com/gogf/gf/v2/net/ghttp"
 	"github.com/mndon/gf-extensions/adminx/internal/controller"
 	_ "github.com/mndon/gf-extensions/adminx/internal/logic"
-	"github.com/mndon/gf-extensions/adminx/internal/service"
 )
 
 func RouterRegister(ctx context.Context, group *ghttp.RouterGroup) {
@@ -24,7 +23,7 @@ func RouterRegister(ctx context.Context, group *ghttp.RouterGroup) {
 		//登陆鉴权、用户信息注入、访问权限鉴权
 		group.Middleware(MiddlewareLoginAuth, MiddlewareCtx, MiddlewarePermissionAuth)
 		//后台操作日志记录
-		group.Hook("/*", ghttp.HookAfterOutput, service.OperateLog().OperationLog)
+		group.Hook("/*", ghttp.HookAfterOutput, OperationLog)
 		// 绑定控制器
 		group.Bind(
 			controller.User,
