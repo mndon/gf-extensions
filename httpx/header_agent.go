@@ -2,9 +2,10 @@ package httpx
 
 import (
 	"context"
-	"github.com/gogf/gf/v2/net/ghttp"
 	"regexp"
 	"strings"
+
+	"github.com/gogf/gf/v2/net/ghttp"
 )
 
 const ctxKeyForAgent = "httpxAgent"
@@ -18,6 +19,10 @@ type Agent struct {
 	brand      string // 设备厂商
 	model      string // 设备型号
 	passport   string // 设备id
+}
+
+func NewAgent(agent string) *Agent {
+	return &Agent{agent: agent}
 }
 
 func AgentFromCtx(ctx context.Context) (agent *Agent) {
