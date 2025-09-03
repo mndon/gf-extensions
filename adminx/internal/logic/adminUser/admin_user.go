@@ -491,7 +491,7 @@ func (s *sAdminUser) UserNameOrMobileExists(ctx context.Context, userName, mobil
 		if user.UserName == userName {
 			liberr.ErrIsNil(ctx, gerror.New("用户名已存在"))
 		}
-		if user.Mobile == mobile {
+		if user.Mobile != "" && mobile != "" && user.Mobile == mobile {
 			liberr.ErrIsNil(ctx, gerror.New("手机号已存在"))
 		}
 	})

@@ -28,13 +28,12 @@ type PersonalInfoRes struct {
 // SetPersonalReq 添加修改用户公用请求字段
 type SetPersonalReq struct {
 	Nickname  string `p:"nickname" v:"required#用户昵称不能为空"`
-	Mobile    string `p:"mobile" v:"required|phone#手机号不能为空|手机号格式错误"`
+	Mobile    string `p:"mobile"`
 	Remark    string `p:"remark"`
 	Sex       int    `p:"sex"`
-	UserEmail string `p:"userEmail" v:"required|email#邮箱不能为空|邮箱格式错误"`
+	UserEmail string `p:"userEmail"`
 	Describe  string `p:"describe"` //签名
 	Avatar    string `p:"avatar"`   //签名
-
 }
 
 // PersonalEditReq 修改个人

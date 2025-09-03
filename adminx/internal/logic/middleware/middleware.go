@@ -9,6 +9,7 @@ package middleware
 
 import (
 	"fmt"
+
 	"github.com/gogf/gf/v2/errors/gcode"
 	"github.com/gogf/gf/v2/errors/gerror"
 	"github.com/gogf/gf/v2/frame/g"
@@ -62,7 +63,7 @@ func (s *sMiddleware) PermissionAuth(r *ghttp.Request) {
 	if len(accessParams) > 0 && accessParams[0] != "undefined" {
 		accessParamsStr = "?" + gstr.Join(accessParams, "&")
 	}
-	url := gstr.TrimLeft(r.Request.URL.Path, "/") + accessParamsStr
+	url := r.Request.URL.Path + accessParamsStr
 	//获取无需验证权限的用户id
 	tagSuperAdmin := false
 	service.AdminUser().NotCheckAuthAdminIds(ctx).Iterator(func(v interface{}) bool {
