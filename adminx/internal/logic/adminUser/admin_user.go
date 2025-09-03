@@ -10,6 +10,7 @@ package adminUser
 import (
 	"context"
 	"fmt"
+
 	"github.com/gogf/gf/v2/container/gset"
 	"github.com/gogf/gf/v2/database/gdb"
 	"github.com/gogf/gf/v2/errors/gerror"
@@ -49,7 +50,7 @@ func (s *sAdminUser) GetCasBinUserPrefix() string {
 }
 
 func (s *sAdminUser) NotCheckAuthAdminIds(ctx context.Context) *gset.Set {
-	ids := g.Cfg().MustGet(ctx, "api.notCheckAuthAdminIds")
+	ids := g.Cfg().MustGet(ctx, "admin.notCheckAuthAdminIds")
 	if !g.IsNil(ids) {
 		return gset.NewFrom(ids)
 	}

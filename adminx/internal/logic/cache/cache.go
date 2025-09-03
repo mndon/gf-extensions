@@ -24,8 +24,8 @@ func New() *sCache {
 		ctx            = gctx.New()
 		cacheContainer *cache.GfCache
 	)
-	prefix := g.Cfg().MustGet(ctx, "system.cache.prefix").String()
-	model := g.Cfg().MustGet(ctx, "system.cache.model").String()
+	prefix := g.Cfg().MustGet(ctx, "admin.cache.prefix").String()
+	model := g.Cfg().MustGet(ctx, "admin.cache.model").String()
 	if model == consts.CacheModelRedis {
 		// redis
 		cacheContainer = cache.NewRedis(prefix)
