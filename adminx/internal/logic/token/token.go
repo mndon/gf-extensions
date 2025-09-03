@@ -11,7 +11,6 @@ import (
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/os/gctx"
 	"github.com/mndon/gf-extensions/adminx/internal/consts"
-	"github.com/mndon/gf-extensions/adminx/internal/lib/liberr"
 	"github.com/mndon/gf-extensions/adminx/internal/model"
 	"github.com/mndon/gf-extensions/adminx/internal/service"
 	"github.com/tiger1103/gfast-token/gftoken"
@@ -23,12 +22,10 @@ type sToken struct {
 
 func New() *sToken {
 	var (
-		ctx = gctx.New()
-		opt *model.TokenOptions
-		err = g.Cfg().MustGet(ctx, "gfToken").Struct(&opt)
+		opt = getOptions()
 		fun gftoken.OptionFunc
 	)
-	liberr.ErrIsNil(ctx, err)
+
 	if opt.CacheModel == consts.CacheModelRedis {
 		fun = gftoken.WithGRedis()
 	} else {
@@ -44,6 +41,26 @@ func New() *sToken {
 			fun,
 		),
 	}
+}
+
+func getOptions() *model.TokenOptions {
+	ctx := gctx.New()
+	var opt *model.TokenOptions
+	v, _ := g.Cfg().Get(ctx, "admin.gfToken")
+	if v != nil {
+		v.Struct(&opt)
+	} else {
+		opt = &model.TokenOptions{
+			CacheKey:     "admin:gfToken",
+			Timeout:      10800,
+			MaxRefresh:   5400,
+			MultiLogin:   true,
+			EncryptKey:   []byte("49c54195e750b04e74a8429b17896586"),
+			ExcludePaths: []string{},
+			CacheModel:   "memory",
+		}
+	}
+	return opt
 }
 
 func init() {
