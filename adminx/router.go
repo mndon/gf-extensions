@@ -39,7 +39,8 @@ func RouterRegister(ctx context.Context, group *ghttp.RouterGroup) {
 				controller.OperLog,
 				controller.Personal,
 				controller.UserOnline,
-				controller.Cache, // 缓存处理
+				controller.Cache,    // 缓存处理
+				controller.KvConfig, // kv配置
 			)
 		})
 	})
