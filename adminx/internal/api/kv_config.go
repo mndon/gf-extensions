@@ -7,7 +7,7 @@ import (
 )
 
 type KvConfigListReq struct {
-	g.Meta `path:"/api/v1/kv_config/list" method:"get"`
+	g.Meta `path:"/kv_config/list" method:"get"`
 	model.KvConfigListInput
 }
 
@@ -16,7 +16,7 @@ type KvConfigListRes struct {
 }
 
 type KvConfigGetReq struct {
-	g.Meta `path:"/api/v1/kv_config/get" method:"get"`
+	g.Meta `path:"/kv_config/get" method:"get"`
 	K      string `json:"k"`
 }
 
@@ -25,7 +25,7 @@ type KvConfigGetRes struct {
 }
 
 type KvConfigCreateReq struct {
-	g.Meta `path:"/api/v1/kv_config/create" method:"post"`
+	g.Meta `path:"/kv_config/create" method:"post"`
 	kvconfigx.KvConfigDo
 }
 
@@ -34,7 +34,7 @@ type KvConfigCreateRes struct {
 }
 
 type KvConfigUpdateReq struct {
-	g.Meta `path:"/api/v1/kv_config/update" method:"post"`
+	g.Meta `path:"/kv_config/update" method:"post"`
 	kvconfigx.KvConfigDo
 }
 
@@ -42,7 +42,7 @@ type KvConfigUpdateRes struct {
 }
 
 type KvConfigDeleteReq struct {
-	g.Meta `path:"/api/v1/kv_config/delete" method:"post"`
+	g.Meta `path:"/kv_config/delete" method:"post"`
 }
 
 type KvConfigDeleteRes struct {

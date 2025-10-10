@@ -57,7 +57,7 @@ func getOptions() *model.TokenOptions {
 			MultiLogin:   true,
 			EncryptKey:   []byte("49c54195e750b04e74a8429b17896586"),
 			ExcludePaths: []string{},
-			CacheModel:   "memory",
+			CacheModel:   consts.CacheModelRedis,
 		}
 	}
 	return opt
