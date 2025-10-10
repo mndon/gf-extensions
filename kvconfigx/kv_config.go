@@ -132,6 +132,15 @@ func GetBool(ctx context.Context, key string, def ...bool) (out bool, err error)
 // @param data
 // @return err
 func AdminCreate(ctx context.Context, data KvConfigDo) (err error) {
+	var item *entity.KvConfig
+	err = dao.KvConfig.Ctx(ctx).Where(do.KvConfig{K: data.K}).Scan(&item)
+	if err != nil {
+		return err
+	}
+	if item != nil {
+		return errorx.BadRequestErr("key已存在", "key已存在")
+	}
+
 	_, err = dao.KvConfig.Ctx(ctx).Data(data).Insert()
 	return err
 }
@@ -144,7 +153,6 @@ func AdminCreate(ctx context.Context, data KvConfigDo) (err error) {
 // @return err
 func AdminUpdate(ctx context.Context, data KvConfigDo) (err error) {
 	data.Id = nil
-	data.K = nil
 	data.UpdatedTime = nil
 	data.CreatedTime = nil
 	_, err = dao.KvConfig.Ctx(ctx).Data(data).Where(do.KvConfig{K: data.K}).Update()
@@ -197,18 +205,18 @@ func AdminGet(ctx context.Context, key string) (item *entity.KvConfig, err error
 // @return list
 // @return total
 // @return err
-func AdminList(ctx context.Context, key string, page, size int) (list []entity.KvConfig, total int, err error) {
+func AdminList(ctx context.Context, k string, page, size int) (list []entity.KvConfig, total int, err error) {
 	conn := dao.KvConfig.Ctx(ctx)
 
-	if key != "" {
-		conn = conn.WhereLike(dao.KvConfig.Columns().K, key)
+	if k != "" {
+		conn = conn.WhereLike(dao.KvConfig.Columns().K, "%"+k+"%")
 	}
 	total, err = conn.Count()
 	if err != nil {
 		return nil, 0, err
 	}
 
-	err = conn.Page(page, size).OrderDesc(dao.KvConfig.Columns().Id).Scan(list)
+	err = conn.Page(page, size).OrderDesc(dao.KvConfig.Columns().Id).Scan(&list)
 	if err != nil {
 		return nil, 0, err
 	}
