@@ -9,7 +9,6 @@ package middleware
 
 import (
 	"fmt"
-
 	"github.com/gogf/gf/v2/errors/gcode"
 	"github.com/gogf/gf/v2/errors/gerror"
 	"github.com/gogf/gf/v2/frame/g"
@@ -126,12 +125,12 @@ func (s *sMiddleware) PermissionAuth(r *ghttp.Request) {
 				return
 			}
 			if !hasAccess {
-				r.SetError(gerror.WrapCode(gcode.New(4030, "没有访问权限1", nil), err))
+				r.SetError(gerror.NewCode(gcode.New(4030, "没有访问权限1", nil)))
 				return
 			}
 		}
 	} else if accessParamsStr != "" {
-		r.SetError(gerror.WrapCode(gcode.New(4030, "没有访问权限2", nil), err))
+		r.SetError(gerror.NewCode(gcode.New(4030, "没有访问权限2", nil)))
 		return
 	}
 	r.Middleware.Next()

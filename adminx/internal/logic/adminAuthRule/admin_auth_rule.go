@@ -11,7 +11,6 @@ import (
 	"context"
 	"fmt"
 	"github.com/gogf/gf/v2/database/gdb"
-	"github.com/gogf/gf/v2/errors/gerror"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/util/gconv"
 	"github.com/mndon/gf-extensions/adminx/internal/api"
@@ -107,10 +106,10 @@ func (s *sAdminAuthRule) GetIsButtonList(ctx context.Context) ([]*model.AdminAut
 
 // Add 添加菜单
 func (s *sAdminAuthRule) Add(ctx context.Context, req *api.RuleAddReq) (err error) {
-	if s.menuNameExists(ctx, req.Name, 0) {
-		err = gerror.New("接口规则已经存在")
-		return
-	}
+	//if s.menuNameExists(ctx, req.Name, 0) {
+	//	err = gerror.New("接口规则已经存在")
+	//	return
+	//}
 	err = g.DB().Transaction(ctx, func(ctx context.Context, tx gdb.TX) error {
 		err = g.Try(ctx, func(ctx context.Context) {
 			//菜单数据
@@ -195,10 +194,10 @@ func (s *sAdminAuthRule) GetMenuRoles(ctx context.Context, id uint) (roleIds []u
 }
 
 func (s *sAdminAuthRule) Update(ctx context.Context, req *api.RuleUpdateReq) (err error) {
-	if s.menuNameExists(ctx, req.Name, req.Id) {
-		err = gerror.New("接口规则已经存在")
-		return
-	}
+	//if s.menuNameExists(ctx, req.Name, req.Id) {
+	//	err = gerror.New("接口规则已经存在")
+	//	return
+	//}
 	err = g.DB().Transaction(ctx, func(ctx context.Context, tx gdb.TX) error {
 		err = g.Try(ctx, func(ctx context.Context) {
 			//菜单数据
