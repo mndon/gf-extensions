@@ -52,8 +52,8 @@ func getOptions() *model.TokenOptions {
 	} else {
 		opt = &model.TokenOptions{
 			CacheKey:     "admin:gfToken",
-			Timeout:      10800,
-			MaxRefresh:   5400,
+			Timeout:      43200,
+			MaxRefresh:   0,
 			MultiLogin:   true,
 			EncryptKey:   []byte("49c54195e750b04e74a8429b17896586"),
 			ExcludePaths: []string{},
