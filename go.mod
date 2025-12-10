@@ -2,8 +2,6 @@ module github.com/mndon/gf-extensions
 
 go 1.23
 
-toolchain go1.24.2
-
 require (
 	github.com/aliyun/aliyun-oss-go-sdk v2.2.5+incompatible
 	github.com/asaskevich/EventBus v0.0.0-20200907212545-49d423059eef
