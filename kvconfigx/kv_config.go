@@ -25,41 +25,31 @@ var cache = gcache.New()
 // @param key
 // @return out
 // @return err
-func Get(ctx context.Context, key string) (out *gvar.Var, err error) {
-	// 读缓存
-	cacheValue, err := cache.Get(ctx, key)
-	if err != nil {
-		return nil, err
-	}
-	if cacheValue != nil {
-		return cacheValue, nil
+func Get(ctx context.Context, key string, clientVisibles ...bool) (out *gvar.Var, err error) {
+	clientVisible := true
+	if len(clientVisibles) > 0 {
+		clientVisible = clientVisibles[0]
 	}
 
-	// 读数据库，并缓存
-	var item *entity.KvConfig
-	err = dao.KvConfig.Ctx(ctx).Where(do.KvConfig{K: key}).Scan(&item)
+	item, err := getFromDB(ctx, key)
 	if err != nil {
 		return nil, err
 	}
-	if item == nil {
-		return nil, errorx.NotFoundErr("no.such.config", "无此配置，请联系客服解决")
-	}
-	err = cache.Set(ctx, key, item.V, time.Second*10)
-	if err != nil {
-		return nil, err
+	if item.ClientVisible == 0 && !clientVisible {
+		return nil, errorx.NotFoundErr("no.such.config:2", "无此配置，请联系客服解决:2")
 	}
 
 	return gvar.New(item.V), nil
 }
 
 // GetAndFormatToMapOrSlices
-// @Description: 将
+// @Description: 获取key配置， 并序列化成map或者slice
 // @param ctx
 // @param v
 // @return out
 // @return err
-func GetAndFormatToMapOrSlices(ctx context.Context, key string) (out any, err error) {
-	v, err := Get(ctx, key)
+func GetAndFormatToMapOrSlices(ctx context.Context, key string, clientVisibles ...bool) (out any, err error) {
+	v, err := Get(ctx, key, clientVisibles...)
 	if err != nil {
 		return nil, err
 	}
@@ -122,6 +112,40 @@ func GetBool(ctx context.Context, key string, def ...bool) (out bool, err error)
 	}
 
 	return cacheValue.Bool(), nil
+}
+
+// getFromDB
+// @Description: 从数据库获取kv记录
+// @param ctx
+// @param key
+// @return item
+// @return err
+func getFromDB(ctx context.Context, key string) (item *entity.KvConfig, err error) {
+	cacheValue, err := cache.Get(ctx, key)
+	if err != nil {
+		return nil, err
+	}
+	if cacheValue != nil {
+		err = cacheValue.Scan(&item)
+		if err != nil {
+			return nil, err
+		}
+		return item, nil
+	}
+
+	err = dao.KvConfig.Ctx(ctx).Where(do.KvConfig{K: key}).Scan(&item)
+	if err != nil {
+		return nil, err
+	}
+	if item == nil {
+		return nil, errorx.NotFoundErr("no.such.config", "无此配置，请联系客服解决")
+	}
+	err = cache.Set(ctx, key, item, time.Second*10)
+	if err != nil {
+		return nil, err
+	}
+
+	return item, nil
 }
 
 // ------------ 以下为后台方法 ------------
