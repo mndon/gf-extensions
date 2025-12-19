@@ -36,6 +36,10 @@ func HttpServerBootUp(ctx context.Context, s *ghttp.Server) {
 		s.EnablePProf()
 	}
 
+	if g.Cfg().MustGet(ctx, "pprof.enable", false).Bool() {
+		enableHealthCheck(s)
+	}
+
 }
 
 // TestBootUp
