@@ -1,7 +1,7 @@
 package textx
 
 import (
-	"github.com/flosch/pongo2/v6"
+	"github.com/slongfield/pyfmt"
 )
 
 // TplRender
@@ -10,11 +10,7 @@ import (
 // @param vars
 // @return string
 func TplRender(text string, vars map[string]any) string {
-	tpl, err := pongo2.FromString(text)
-	if err != nil {
-		return text
-	}
-	output, err := tpl.Execute(vars) // 输出渲染结果
+	output, err := pyfmt.Fmt(text, vars)
 	if err != nil {
 		return text
 	}

@@ -5,9 +5,9 @@ import (
 )
 
 func TestTplRender(t *testing.T) {
-	tpl := "1{{a}}2"
+	tpl := "<div>1{a}2</div>"
 	vars := map[string]any{
-		"a": "a",
+		"a": "b",
 	}
 	result := TplRender(tpl, vars)
 	t.Log(result)
