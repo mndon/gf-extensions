@@ -36,8 +36,10 @@ func AgentFromCtx(ctx context.Context) (agent *Agent) {
 	if r == nil {
 		return
 	}
-	if r.Header.Get(HeaderXA) != "" {
-		agent.agent = r.Header.Get(HeaderXA)
+	if v := r.Header.Get(HeaderXA); v != "" {
+		agent.agent = v
+	} else if v := r.GetQuery(HeaderXA); !v.IsNil() && v.String() != "" {
+		agent.agent = v.String()
 	} else {
 		agent.agent = r.Header.Get(HeaderUA)
 	}

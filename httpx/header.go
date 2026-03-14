@@ -6,10 +6,10 @@ import (
 )
 
 const (
-	HeaderRemoteIp      = "X-Real-Ip"
-	HeaderXA            = "X-Agent"
-	HeaderUA            = "User-Agent"
-	HeaderAuthorization = "Authorization"
+	HeaderRemoteIp      = "x-real-ip"
+	HeaderXA            = "x-agent"
+	HeaderUA            = "user-agent"
+	HeaderAuthorization = "authorization"
 )
 
 func GetRemoteIpFromCtx(ctx context.Context) string {
