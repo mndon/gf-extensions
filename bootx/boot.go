@@ -7,7 +7,6 @@ import (
 	"github.com/gogf/gf/v2/net/ghttp"
 	"github.com/mndon/gf-extensions/configx"
 	"github.com/mndon/gf-extensions/logx"
-	"github.com/mndon/gf-extensions/uidx"
 )
 
 func init() {
@@ -17,8 +16,6 @@ func init() {
 	// 2. 日志配置
 	logx.Init(context.Background())
 
-	// 3. 雪花发号器初始化
-	uidx.Init(0)
 }
 
 // HttpServerBootUp
